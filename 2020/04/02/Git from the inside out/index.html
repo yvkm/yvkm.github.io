@@ -9,47 +9,47 @@
   <meta name="description" content="经作者同意翻译成中文，有所增删。欢迎指正不足之处，转载注明出处。原文链接 作者 本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。 本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在Git的真正实现上。从Git的实现角度去理解Git可以让你更加清楚Git做了什么，它正在">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深入浅出Git原理">
-<meta property="og:url" content="http://github.com/yvkm/2020/04/02/Git/index.html">
+<meta property="og:url" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/index.html">
 <meta property="og:site_name" content="Yvkm">
 <meta property="og:description" content="经作者同意翻译成中文，有所增删。欢迎指正不足之处，转载注明出处。原文链接 作者 本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。 本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在Git的真正实现上。从Git的实现角度去理解Git可以让你更加清楚Git做了什么，它正在">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/1-a1-tree-graph.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/2-a1-commit.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/3-a1-refs.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/4-a1-wc-and-index.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/5-a1-wc-number-set-to-2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/6-a1-wc-and-index-number-set-to-2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/7-a2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/8-a2-just-objects-commits-and-refs.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/9-a2-detached-head.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/10-a3-detached-head.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/11-a3-on-deputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/12-a3-on-master-on-a2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/13-a3ondeputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/14-a3-on-master-on-a2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/15-a3-on-master.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/16-a4-b3-on-deputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/17-a4-b3-on-deputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/18-b4-on-deputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/19-b4-master-deputy-on-b4.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/20-b5-on-deputy-b6-on-master.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/21-b6-on-master-with-merge-head.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/23-b11-with-objects-wc-and-index.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/24-b11-letter-removed-from-wc-and-index.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/25-11.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/26-11-cp-alpha-to-bravo.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/27-12-bravo.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/28-12-fetched-to-alpha.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/29-12-merged-to-alpha.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/30-13-alpha-cloned-to-delta-bare.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/31-14-alpha.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/32-14-pushed-to-delta.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/1-a1-tree-graph.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/2-a1-commit.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/3-a1-refs.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/4-a1-wc-and-index.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/5-a1-wc-number-set-to-2.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/6-a1-wc-and-index-number-set-to-2.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/7-a2.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/8-a2-just-objects-commits-and-refs.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/9-a2-detached-head.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/10-a3-detached-head.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/11-a3-on-deputy.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/12-a3-on-master-on-a2.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/13-a3ondeputy.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/14-a3-on-master-on-a2.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/15-a3-on-master.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/16-a4-b3-on-deputy.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/17-a4-b3-on-deputy.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/18-b4-on-deputy.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/19-b4-master-deputy-on-b4.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/20-b5-on-deputy-b6-on-master.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/21-b6-on-master-with-merge-head.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/23-b11-with-objects-wc-and-index.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/24-b11-letter-removed-from-wc-and-index.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/25-11.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/26-11-cp-alpha-to-bravo.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/27-12-bravo.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/28-12-fetched-to-alpha.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/29-12-merged-to-alpha.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/30-13-alpha-cloned-to-delta-bare.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/31-14-alpha.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/32-14-pushed-to-delta.png">
 <meta property="article:published_time" content="2020-04-02T05:47:11.859Z">
 <meta property="article:modified_time" content="2020-04-02T09:42:55.827Z">
 <meta property="article:author" content="yvkm">
 <meta property="article:tag" content="git">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/1-a1-tree-graph.png">
+<meta name="twitter:image" content="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/images/git-from-the-inside-out/1-a1-tree-graph.png">
   
   
     <link rel="icon" href="/favicon.png">
@@ -72,7 +72,7 @@
       </h1>
       
         <h2 id="subtitle-wrap">
-          <a href="/" id="subtitle">&lt;3 code</a>
+          <a href="/" id="subtitle">&lt;3 code.</a>
         </h2>
       
     </div>
@@ -108,9 +108,9 @@
 </script>
 </header>
     <div class="outer">
-      <section id="main"><article id="post-Git" class="article article-type-post" itemscope itemprop="blogPost">
+      <section id="main"><article id="post-Git from the inside out" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2020/04/02/Git/" class="article-date">
+    <a href="/2020/04/02/Git%20from%20the%20inside%20out/" class="article-date">
   <time datetime="2020-04-02T05:47:11.859Z" itemprop="datePublished">2020-04-02</time>
 </a>
     
@@ -520,7 +520,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://github.com/yvkm/2020/04/02/Git/" data-id="ck8idtvsu0000mwap5y5zdpat" class="article-share-link" data-share="baidu" data-title="深入浅出Git原理">分享到</a>
+        <a data-url="http://github.com/yvkm/2020/04/02/Git%20from%20the%20inside%20out/" data-id="ck8ilhmi7000008ap4by0evst" class="article-share-link" data-share="baidu" data-title="深入浅出Git原理">分享到</a>
       
 
       
@@ -582,7 +582,7 @@
       <ul>
         
           <li>
-            <a href="/2020/04/02/Git/">深入浅出Git原理</a>
+            <a href="/2020/04/02/Git%20from%20the%20inside%20out/">深入浅出Git原理</a>
           </li>
         
       </ul>
