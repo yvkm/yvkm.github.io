@@ -13,9 +13,7 @@
 <meta property="og:site_name" content="Yvkm">
 <meta property="og:description" content="经作者同意翻译成中文，有所增删。原文链接 本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。 本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在Git的真正实现上。从Git的实现角度去理解Git可以让你更加清楚Git做了什么，它正在做什么，它将要做什么。 创建一个项目">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/Untitled.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/Untitled%201.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/Untitled%202.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/3-a1-refs.png">
 <meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/4-a1-wc-and-index.png">
 <meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/5-a1-wc-number-set-to-2.png">
 <meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/6-a1-wc-and-index-number-set-to-2.png">
@@ -44,11 +42,11 @@
 <meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/31-14-alpha.png">
 <meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/32-14-pushed-to-delta.png">
 <meta property="article:published_time" content="2020-04-02T03:46:19.339Z">
-<meta property="article:modified_time" content="2020-04-02T04:26:50.829Z">
+<meta property="article:modified_time" content="2020-04-02T05:00:27.686Z">
 <meta property="article:author" content="yvkm">
 <meta property="article:tag" content="git">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/Untitled.png">
+<meta name="twitter:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/3-a1-refs.png">
   
   
     <link rel="icon" href="/favicon.png">
@@ -180,81 +178,43 @@
 <p>需要注意的是，只有在data目录下的文件添加到index中，data目录并没有添加到index中。</p>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alpha <span class="variable">$</span> printf <span class="string">'1'</span> &gt; <span class="keyword">data</span>/number.txt</span><br><span class="line">alpha <span class="variable">$</span> git add <span class="keyword">data</span></span><br></pre></td></tr></table></figure>
 
-<p>用户将data/number.txt中的1234改为1.这时Git会重新在.git/objects中创建一个blob文件，并且更新index，将哈希值改为根据新内容生成的哈希值。</p>
+<p>用户将<code>data/number.txt</code>中的<code>1234</code>改为<code>1</code>.这时Git会重新在.git/objects中创建一个blob文件，并且更新index，将哈希值改为根据新内容生成的哈希值。</p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">alpha</span> $ printf '<span class="number">1</span>tree .git/objects</span><br><span class="line">.git/objects</span><br><span class="line">|<span class="comment">-- 27</span></span><br><span class="line">|   `<span class="comment">-- 4c0052dd5408f8ae2bc8440029ff67d79bc5c3</span></span><br><span class="line">|<span class="comment">-- 2e</span></span><br><span class="line">|   `<span class="comment">-- 65efe2a145dda7ee51d1741299f848e5bf752e</span></span><br><span class="line">|<span class="comment">-- 56</span></span><br><span class="line">|   `<span class="comment">-- a6051ca2b02b04ef92d5150c9ef600403cb1de</span></span><br><span class="line">|<span class="comment">-- info</span></span><br><span class="line">`<span class="comment">-- pack</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">data</span>/letter.txt 2e65efe2a145dda7ee51d1741299f848e5bf752e</span></span><br><span class="line"><span class="class"><span class="keyword">data</span>/number.txt 56a6051ca2b02b04ef92d5150c9ef600403cb1de</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="提交"><a href="#提交" class="headerlink" title="提交"></a>提交</h2><hr>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git <span class="keyword">commit</span> -m <span class="string">'a1'</span></span><br><span class="line">[<span class="keyword">master</span> (root-<span class="keyword">commit</span>) a89ea18] a1</span><br><span class="line"> <span class="number">2</span> files <span class="keyword">changed</span>, <span class="number">2</span> insertions(+)</span><br><span class="line"> <span class="keyword">create</span> <span class="keyword">mode</span> <span class="number">100644</span> <span class="keyword">data</span>/letter.txt</span><br><span class="line"> <span class="keyword">create</span> <span class="keyword">mode</span> <span class="number">100644</span> <span class="keyword">data</span>/number.txt</span><br></pre></td></tr></table></figure>
-<p>用户将这次提交标记为a1. git commit完成了三个步骤：</p>
+<p>用户将这次提交注释记为<code>a1</code>(后面将以<code>commit a1</code>表示本次提交生成的commit对象或表示注释为a1的提交，请视上下文语义确定其含义)。. <code>git commit</code>完成了三个动作：</p>
 <ul>
 <li>创建了一个树形图表示这次提交的项目版本内容。</li>
 <li>创建一个commit对象。</li>
 <li>将HEAD指向当前分支最新的commit对象</li>
 </ul>
-<h3 id="创建树形图"><a href="#创建树形图" class="headerlink" title="创建树形图"></a>创建树形图</h3><p>Git通过<code>index</code>创建树树形图来记录当前项目的状态，相当于记录了一个快照。这个树形图记录了项目中所有文件的<code>位置</code>和<code>内容</code>。</p>
+<h3 id="创建树形图"><a href="#创建树形图" class="headerlink" title="创建树形图"></a>创建树形图</h3><hr>
+<p>Git通过<code>index</code>创建树形图来记录当前项目的状态，相当于记录了一个快照。这个树形图记录了项目中所有文件的<code>位置</code>和<code>内容</code>。</p>
 <p>这个树形图由两种对象组成：blobs和trees.</p>
-<p>Blob对象已经通过git add储存在.git/objects中，它们代表文件的内容。</p>
-<p>Tree对象在git commit时生成，tree对象表示工作空间中的目录。</p>
-<p>下面是git commit生成的三个对象，及内容。</p>
-<pre><code>alpha $ tree .git/objects
-.git/objects
-|-- ... # 比之前多了下面三个对象。
-|-- 0e
-|   `-- ed1217a2947f4930583229987d90fe5e8e0b74
-|-- a8
-|   `-- 9ea183a48e484c318335fd25c8adcc82608c35
-|-- ff
-|   `-- e298c3ce8bb07326f888907996eaa48d266db4
-|-- info
-`-- pack
-alpha $ git cat-file -t 0eed
-tree
-alpha $ git cat-file -p 0eed
-100644 blob 2e65efe2a145dda7ee51d1741299f848e5bf752e    letter.txt
-100644 blob 56a6051ca2b02b04ef92d5150c9ef600403cb1de    number.txt
-alpha $ git cat-file -t ffe2
-tree
-alpha $ git cat-file -p **ffe2**
-040000 tree **0eed**1217a2947f4930583229987d90fe5e8e0b74    data</code></pre><p>从上面可以看到 tree 对象<code>ffe2</code>指向 tree对象 <code>0eed</code></p>
-<p>tree对象<code>0eed</code>中的内容，它代表了<code>data</code>目录</p>
-<pre><code>100644 blob 2e65efe2a145dda7ee51d1741299f848e5bf752e    letter.txt
-100644 blob 56a6051ca2b02b04ef92d5150c9ef600403cb1de    number.txt</code></pre><p>上面的第一条记录了用于重新的生成data/letter.txt文件的所有信息。这条记录分为四部分：第一部分 100644表示文件的权限。第二部分 blob表示这个文件的内容由blob表示，而不是tree。第三部分 表示这个blob的哈希值。第四部分表示文件名。</p>
-<p>第二条记录类似第一条。</p>
-<p>tree对象ffe2表示 alpha目录不，它表示项目的根目录</p>
-<pre><code>alpha $ git cat-file -p ffe2
-040000 tree 0eed1217a2947f4930583229987d90fe5e8e0b74</code></pre><p>a1 提交的树形图可以用图表示</p>
-<p><img src="images/git-from-the-inside-out/Untitled.png" alt="Untitled.png"></p>
-<h3 id="创建一个commit对象"><a href="#创建一个commit对象" class="headerlink" title="创建一个commit对象"></a>创建一个commit对象</h3><hr>
-<p>git commit在创建完上面的树形图后创建一个commit对象。这个commit对象同样存储在.git/objects中</p>
-<pre><code>alpha $ git cat-file -t a89e
-commit
-alpha $ git cat-file -p a89e
-tree ffe298c3ce8bb07326f888907996eaa48d266db4
-author xiejianxun &lt;xiejianxun@outlook.comm&gt; 1583742597 +0800
-committer xiejianxun &lt;xiejianxun@outlook.comm&gt; 1583742597 +0800
-
-a1</code></pre><p>第一行指定向了树形图。这个哈希值上面有提到，它就是表示项目的根目录。在当前环境下，就是alpha目录。最后一行表示提交的信息。</p>
-<p><img src="images/git-from-the-inside-out/Untitled%201.png" alt="Untitled%201.png"></p>
-<h3 id="指向当前分支最新的commit对象"><a href="#指向当前分支最新的commit对象" class="headerlink" title="指向当前分支最新的commit对象"></a>指向当前分支最新的commit对象</h3><hr>
-<p><code>git command</code>最后要做的是将指向当前分支的最新的commit对象</p>
-<p>那么，哪里记录着当前分支呢？在Git中，HEAD 文件记录着当前工作的分支，文件位于<code>.git/HEAD</code></p>
-<pre><code>alpha $ cat .git/HEAD
-ref: refs/heads/master
-# heads下记录了当前仓库拥有多个分支</code></pre><p><code>HEAD</code>中记录着它指向了<code>master</code>分支，也就是说<code>master</code>就是当前正在工作的分支。</p>
-<p><code>HEAD</code>和<code>master</code>都是引用.<code>引用</code>就是Git使用的一个标签或用户用于标识特定提交的<code>tag</code>。</p>
-<pre><code>alpha $ cat .git/refs/heads/master
-a89ea183a48e484c318335fd25c8adcc82608c35
-alpha $ git cat-file -t a89e
-commit</code></pre><p>master文件中存储了一个哈希值，它表示一个commit对象。(这个哈希值可能不一致，因为它包含提交用户的信息）</p>
+<p>Blob对象已经通过<code>git add</code>储存在<code>.git/objects</code>中，它们代表文件的内容。</p>
+<p>Tree对象在<code>git commit</code>时生成，tree对象表示工作空间中的目录。</p>
+<p>下面是<code>git commit</code>生成的三个对象及内容。</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">alpha $ tree .git/objects</span><br><span class="line">.git/objects</span><br><span class="line">|<span class="comment">-- ... # 比之前多了下面三个对象。</span></span><br><span class="line">|<span class="comment">-- 0e</span></span><br><span class="line">|   `<span class="comment">-- ed1217a2947f4930583229987d90fe5e8e0b74</span></span><br><span class="line">|<span class="comment">-- a8</span></span><br><span class="line">|   `<span class="comment">-- 9ea183a48e484c318335fd25c8adcc82608c35</span></span><br><span class="line">|<span class="comment">-- ff</span></span><br><span class="line">|   `<span class="comment">-- e298c3ce8bb07326f888907996eaa48d266db4</span></span><br><span class="line">|<span class="comment">-- info</span></span><br><span class="line">`<span class="comment">-- pack</span></span><br><span class="line"></span><br><span class="line">alpha $ git cat-<span class="built_in">file</span> -t <span class="number">0</span>eed</span><br><span class="line">tree</span><br><span class="line">alpha $ git cat-<span class="built_in">file</span> -p <span class="number">0</span>eed</span><br><span class="line"><span class="number">100644</span> blob <span class="number">2e65</span>efe2a145dda7ee51d1741299f848e5bf752e    letter.txt</span><br><span class="line"><span class="number">100644</span> blob <span class="number">56</span>a6051ca2b02b04ef92d5150c9ef600403cb1de    <span class="built_in">number</span>.txt</span><br><span class="line">alpha $ git cat-<span class="built_in">file</span> -t ffe2</span><br><span class="line">tree</span><br><span class="line">alpha $ git cat-<span class="built_in">file</span> -p **ffe2**</span><br><span class="line"><span class="number">040000</span> tree **<span class="number">0</span>eed**<span class="number">1217</span>a2947f4930583229987d90fe5e8e0b74    data</span><br><span class="line">```    </span><br><span class="line"></span><br><span class="line">从上面可以看到 tree 对象`ffe2`指向 tree对象 `<span class="number">0</span>eed`</span><br><span class="line"></span><br><span class="line">tree对象`<span class="number">0</span>eed`中的内容，它代表了`data`目录</span><br></pre></td></tr></table></figure>
+<p>100644 blob 2e65efe2a145dda7ee51d1741299f848e5bf752e    letter.txt<br>100644 blob 56a6051ca2b02b04ef92d5150c9ef600403cb1de    number.txt</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">上面的第一条记录了用于重新的生成`data/letter.txt`文件的所有信息。这条记录分为四部分：第一部分 `100644`表示文件的权限。第二部分 blob表示这个文件的内容由blob表示，而不是tree。第三部分 表示这个blob的哈希值。第四部分表示文件名。</span><br><span class="line"></span><br><span class="line">第二条记录类似第一条。</span><br><span class="line"></span><br><span class="line">tree对象`ffe2`表示`alpha`目录，它表示项目的根目录</span><br></pre></td></tr></table></figure>
+<p>alpha $ git cat-file -p ffe2<br>040000 tree 0eed1217a2947f4930583229987d90fe5e8e0b74</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="code">`commit a1`</span> 提交的树形图可以用图表示</span><br><span class="line"></span><br><span class="line">![<span class="string">a1提交的树形图</span>](<span class="link">images/git-from-the-inside-out/1-a1-tree-graph.png</span>)</span><br><span class="line"></span><br><span class="line"><span class="section">### 创建一个commit对象</span></span><br><span class="line">---</span><br><span class="line"><span class="code">`git commit`</span>在创建完上面的树形图后创建一个commit对象。这个commit对象同样存储在<span class="code">`.git/objects`</span>中</span><br></pre></td></tr></table></figure>
+<p>alpha $ git cat-file -t a89e<br>commit<br>alpha $ git cat-file -p a89e<br>tree ffe298c3ce8bb07326f888907996eaa48d266db4<br>author xiejianxun <a href="mailto:&#120;&#x69;&#x65;&#106;&#x69;&#x61;&#110;&#120;&#x75;&#110;&#x40;&#111;&#x75;&#116;&#x6c;&#x6f;&#111;&#x6b;&#x2e;&#99;&#111;&#109;&#x6d;">&#120;&#x69;&#x65;&#106;&#x69;&#x61;&#110;&#120;&#x75;&#110;&#x40;&#111;&#x75;&#116;&#x6c;&#x6f;&#111;&#x6b;&#x2e;&#99;&#111;&#109;&#x6d;</a> 1583742597 +0800<br>committer xiejianxun <a href="mailto:&#120;&#105;&#101;&#106;&#105;&#97;&#x6e;&#120;&#x75;&#110;&#x40;&#111;&#117;&#116;&#x6c;&#111;&#x6f;&#x6b;&#46;&#99;&#111;&#109;&#x6d;">&#120;&#105;&#101;&#106;&#105;&#97;&#x6e;&#120;&#x75;&#110;&#x40;&#111;&#117;&#116;&#x6c;&#111;&#x6f;&#x6b;&#46;&#99;&#111;&#109;&#x6d;</a> 1583742597 +0800</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">第一行指定向了树形图。这个哈希值上面有提到，它就是表示项目的根目录。在当前环境下，就是<span class="code">`alpha`</span>目录。最后一行表示提交的信息。</span><br><span class="line"></span><br><span class="line">![<span class="string">commit a1对应的commit对象指向的树形图</span>](<span class="link">images/git-from-the-inside-out/2-a1-commit.png</span>)</span><br><span class="line"></span><br><span class="line"><span class="section">### 指向当前分支最新的commit对象</span></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line"><span class="code">`git command`</span>最后要做的是将指向当前分支的最新的commit对象</span><br><span class="line"></span><br><span class="line">那么，哪里记录着当前分支呢？在Git中，HEAD 文件记录着当前工作的分支，文件位于<span class="code">`.git/HEAD`</span></span><br></pre></td></tr></table></figure>
+<h1 id="heads下记录了当前仓库拥有哪些分支"><a href="#heads下记录了当前仓库拥有哪些分支" class="headerlink" title="heads下记录了当前仓库拥有哪些分支"></a>heads下记录了当前仓库拥有哪些分支</h1><p>alpha $ cat .git/HEAD<br>ref: refs/heads/master</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">`HEAD`中记录着它指向了`master`分支，也就是说`master`就是当前正在工作的分支。</span><br><span class="line"></span><br><span class="line">`HEAD`和`master`都是引用.`引用`就是Git使用的一个标签或用户用于标识特定提交的`tag`。</span><br></pre></td></tr></table></figure>
+<p>alpha $ cat .git/refs/heads/master<br>a89ea183a48e484c318335fd25c8adcc82608c35<br>alpha $ git cat-file -t a89e<br>commit</p>
+<p>```<br>master文件中存储了一个哈希值，它表示一个commit对象。(这个哈希值可能不一致，因为它包含提交用户的信息）</p>
 <p>将<code>HEAD</code>和<code>master</code>添加到Git的树形图中，结果是：</p>
-<p><img src="images/git-from-the-inside-out/Untitled%202.png" alt="Untitled%202.png"></p>
+<p><img src="images/git-from-the-inside-out/3-a1-refs.png" alt="HEAD指向master，master指向commit a1"></p>
 <p>Git 对象都是存储在特殊的文件中(需要<code>git cat-file</code>才能查看里面的内容），<code>master</code>和<code>HEAD</code>存储在普通的文件中(直接用<code>cat</code>命令可以查看内容）</p>
-<p>注意：HEAD指向master在commit之前已经完成。master现在指定了最新的commit对象。</p>
+<p>注意：<code>HEAD</code>指向<code>master</code>在commit之前已经完成。<code>master</code>现在指定了最新的commit对象。</p>
 <p>以上是第一次提交的情况。</p>
 <h2 id="非第一次提交的提交"><a href="#非第一次提交的提交" class="headerlink" title="非第一次提交的提交"></a>非第一次提交的提交</h2><hr>
-<p><img src="images/git-from-the-inside-out/4-a1-wc-and-index.png" alt="4-a1-wc-and-index.png"></p>
-<p>下面是一个包含工作空间和<code>index</code>(暂存区的树形图）</p>
-<p>现在workspace、index和a1 commit中的<code>data/letter.txt</code>和<code>data/number.txt</code>都含有相同的内容分别为<code>a</code>和<code>1</code>. <code>index</code>和<code>HEAD</code>都使用哈希值指定它们引用的blob对象，但是工作空间中的内容是用文本存储在不同的地方(即不是.git/objects中）。</p>
+<p><img src="images/git-from-the-inside-out/4-a1-wc-and-index.png" alt="commit a1与工作空间和index之间的关系"></p>
+<p>上面是一个包含工作空间和<code>index</code>(暂存区的树形图）</p>
+<p>现在workspace、index和commit a1中的<code>data/letter.txt</code>和<code>data/number.txt</code>都含有相同的内容分别为<code>a</code>和<code>1</code>. <code>index</code>和<code>HEAD</code>都使用哈希值指定它们引用的blob对象，但是工作空间中的内容是用文本存储在不同的地方(即不是.git/objects中）。</p>
 <p>执行以下的命令后，</p>
 <pre><code>alpha $ printf &apos;2&apos; &gt; data/number.txt
 alpha $ git add data/number.txt</code></pre><p>树形图会发生变化:首先工作空间中的data/number.txt文件发生变化，内容从1变成2. idnex不会变化。</p>
