@@ -5,15 +5,50 @@
   
 
   
-  <title>Hexo</title>
+  <title>深入浅出Git原理 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="Git 深入浅出翻译自：https:&#x2F;&#x2F;codewords.recurse.com&#x2F;issues&#x2F;two&#x2F;git-from-the-inside-out,有所改动。 本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。 本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在G">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入浅出Git原理">
+<meta property="og:url" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Git 深入浅出翻译自：https:&#x2F;&#x2F;codewords.recurse.com&#x2F;issues&#x2F;two&#x2F;git-from-the-inside-out,有所改动。 本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。 本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在G">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/Untitled.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/Untitled%201.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/Untitled%202.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/4-a1-wc-and-index.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/5-a1-wc-number-set-to-2.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/6-a1-wc-and-index-number-set-to-2.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/7-a2.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/9-a2-detached-head.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/10-a3-detached-head.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/11-a3-on-deputy.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/12-a3-on-master-on-a2.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/13-a3ondeputy.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/14-a3-on-master-on-a2.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/15-a3-on-master.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/16-a4-b3-on-deputy.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/17-a4-b3-on-deputy.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/18-b4-on-deputy.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/19-b4-master-deputy-on-b4.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/20-b5-on-deputy-b6-on-master.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/21-b6-on-master-with-merge-head.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/23-b11-with-objects-wc-and-index.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/24-b11-letter-removed-from-wc-and-index.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/25-11.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/26-11-cp-alpha-to-bravo.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/27-12-bravo.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/28-12-fetched-to-alpha.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/29-12-merged-to-alpha.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/30-13-alpha-cloned-to-delta-bare.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/31-14-alpha.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/32-14-pushed-to-delta.png">
+<meta property="article:published_time" content="2020-04-02T01:10:43.945Z">
+<meta property="article:modified_time" content="2020-04-02T01:16:11.091Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/Untitled.png">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -62,9 +97,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-深入浅出Git原理" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-深入浅出Git原理" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/" class="article-date">
   <time datetime="2020-04-02T01:10:43.945Z" itemprop="datePublished">2020-04-02</time>
@@ -77,8 +110,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/">深入浅出Git原理</a>
+    <h1 class="article-title" itemprop="name">
+      深入浅出Git原理
     </h1>
   
 
@@ -655,99 +688,19 @@ f0013185d0a45ecf7f7be00692ddfa6359954513</code></pre><p>第三，alpha/.git/refs
     </footer>
   </div>
   
-</article>
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-Git-from-the-inside-out" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/04/02/Git-from-the-inside-out/" class="article-date">
-  <time datetime="2020-04-02T00:42:35.000Z" itemprop="datePublished">2020-04-02</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/04/02/Git-from-the-inside-out/">Git from the inside out</a>
-    </h1>
+    <a href="/2020/04/02/Git-from-the-inside-out/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Git from the inside out</div>
+    </a>
   
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="/images/test.jpg" alt="alt"></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/02/Git-from-the-inside-out/" data-id="ck8i1jpmo0000gkap8er32hwx" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/" rel="tag">git</a></li></ul>
-
-    </footer>
-  </div>
   
 </article>
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/04/02/hello-world/" class="article-date">
-  <time datetime="2020-04-02T00:20:34.810Z" itemprop="datePublished">2020-04-02</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/04/02/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/02/hello-world/" data-id="ck8i0lxu60000zsap72sv0eg3" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-
 
 </section>
         
