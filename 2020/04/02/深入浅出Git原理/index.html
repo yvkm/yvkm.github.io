@@ -94,12 +94,12 @@
 
 
 
-<meta name="description" content="Git 深入浅出翻译自：https:&#x2F;&#x2F;codewords.recurse.com&#x2F;issues&#x2F;two&#x2F;git-from-the-inside-out,有所改动。 本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。 本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在G">
+<meta name="description" content="本文经作者同意翻译成中文,有所增删。原文链接. 本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在Git的真正实现上。从Git的实现角度去理解Git可以让你更加清楚Git做了什么，它正在做什么，它将要做什么。 创建一个项">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深入浅出Git原理">
 <meta property="og:url" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="Git 深入浅出翻译自：https:&#x2F;&#x2F;codewords.recurse.com&#x2F;issues&#x2F;two&#x2F;git-from-the-inside-out,有所改动。 本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。 本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在G">
+<meta property="og:description" content="本文经作者同意翻译成中文,有所增删。原文链接. 本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在Git的真正实现上。从Git的实现角度去理解Git可以让你更加清楚Git做了什么，它正在做什么，它将要做什么。 创建一个项">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/Untitled.png">
 <meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/Untitled%201.png">
@@ -132,7 +132,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/31-14-alpha.png">
 <meta property="og:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/32-14-pushed-to-delta.png">
 <meta property="article:published_time" content="2020-04-02T01:10:43.945Z">
-<meta property="article:modified_time" content="2020-04-02T01:22:23.938Z">
+<meta property="article:modified_time" content="2020-04-02T01:55:47.794Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://yoursite.com/2020/04/02/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAGit%E5%8E%9F%E7%90%86/images/git-from-the-inside-out/Untitled.png">
@@ -360,60 +360,28 @@
       
 
       
-        <h1 id="Git-深入浅出"><a href="#Git-深入浅出" class="headerlink" title="Git 深入浅出"></a>Git 深入浅出</h1><p>翻译自：<a href="https://codewords.recurse.com/issues/two/git-from-the-inside-out" target="_blank" rel="noopener">https://codewords.recurse.com/issues/two/git-from-the-inside-out</a>,有所改动。</p>
-<p>本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。</p>
-<p>本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在Git的真正实现上。从Git的实现角度去理解Git可以让你更加清楚Git做了什么，它正在做什么，它将要做什么。</p>
+        <p>本文经作者同意翻译成中文,有所增删。<a href="https://codewords.recurse.com/issues/two/git-from-the-inside-out" target="_blank" rel="noopener">原文链接</a>.</p>
+<p>本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。<br>本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在Git的真正实现上。从Git的实现角度去理解Git可以让你更加清楚Git做了什么，它正在做什么，它将要做什么。</p>
 <h2 id="创建一个项目"><a href="#创建一个项目" class="headerlink" title="创建一个项目"></a>创建一个项目</h2><hr>
-<pre><code>~ $ mkdir git
-~ $ cd git
-git $ mkdir alpha
-git $ cd alpha</code></pre><p>创建一个项目的根目录 <code>alpha</code></p>
-<pre><code>alpha $ mkdir data
-alpha $ printf &apos;a&apos; &gt; data/letter.txt</code></pre><p>进入根目录<code>alpha</code>后，创建一个<code>data</code>目录，并在<code>data</code>创建一个<code>letter.txt</code>文件，<code>letter.txt</code>中包含一个字符 <code>a</code>.当前目录的结构如下：</p>
-<pre><code>alpha $ tree
-.
-`-- data
-    `-- letter.txt</code></pre><h2 id="初始化Git仓库"><a href="#初始化Git仓库" class="headerlink" title="初始化Git仓库"></a>初始化Git仓库</h2><hr>
-<pre><code>alpha $ git init
-Initialized empty Git repository in /root/git/alpha/.git/</code></pre><p><code>git init</code>将当前目录变成一个Git仓库。Git在<code>alpha</code>目录下创建了一个名为<code>.git</code>的目录并在这个目录下创建一些文件。这些文件包含了Git配置和项目历史等所有信息。这些文件都是普通文件，没什么特别的。用户可以使用编辑器编辑它们。这时<code>alpha</code>目录的结构如下所示：</p>
-<pre><code>alpha $ tree -a
-.
-|-- data
-|   `-- letter.txt
-`-- .git
-    |-- branches
-    |-- config
-    |-- description
-    |-- HEAD
-    |-- hooks
-    |   |-- applypatch-msg.sample
-    |   |-- commit-msg.sample
-    |   |-- fsmonitor-watchman.sample
-    |   |-- post-update.sample
-    |   |-- pre-applypatch.sample
-    |   |-- pre-commit.sample
-    |   |-- prepare-commit-msg.sample
-    |   |-- pre-push.sample
-    |   |-- pre-rebase.sample
-    |   |-- pre-receive.sample
-    |   `-- update.sample
+<p>~ $ mkdir git<br>~ $ cd git<br>git $ mkdir alpha<br>git $ cd alpha</p>
+<p>创建一个项目的根目录 <code>alpha</code></p>
+<p>alpha $ mkdir data<br>alpha $ printf ‘a’ &gt; data/letter.txt</p>
+<p>进入根目录<code>alpha</code>后，创建一个<code>data</code>目录，并在<code>data</code>创建一个<code>letter.txt</code>文件，<code>letter.txt</code>中包含一个字符 <code>a</code>.当前目录的结构如下：</p>
+<p>alpha $ tree<br>.<br><code>-- data</code>– letter.txt</p>
+<h2 id="初始化Git仓库"><a href="#初始化Git仓库" class="headerlink" title="初始化Git仓库"></a>初始化Git仓库</h2><hr>
+<p>alpha $ git init<br>Initialized empty Git repository in /root/git/alpha/.git/</p>
+<p><code>git init</code>将当前目录变成一个Git仓库。Git在<code>alpha</code>目录下创建了一个名为<code>.git</code>的目录并在这个目录下创建一些文件。这些文件包含了Git配置和项目历史等所有信息。这些文件都是普通文件，没什么特别的。用户可以使用编辑器编辑它们。这时<code>alpha</code>目录的结构如下所示：</p>
+<p>alpha $ tree -a<br>.<br>|– data<br>|   <code>-- letter.txt</code>– .git<br>    |– branches<br>    |– config<br>    |– description<br>    |– HEAD<br>    |– hooks<br>    |   |– applypatch-msg.sample<br>    |   |– commit-msg.sample<br>    |   |– fsmonitor-watchman.sample<br>    |   |– post-update.sample<br>    |   |– pre-applypatch.sample<br>    |   |– pre-commit.sample<br>    |   |– prepare-commit-msg.sample<br>    |   |– pre-push.sample<br>    |   |– pre-rebase.sample<br>    |   |– pre-receive.sample<br>    |   <code>-- update.sample
     |-- info
-    |   `-- exclude
-    |-- objects
-    |   |-- info
-    |   `-- pack
-    `-- refs
-        |-- heads
-        `-- tags</code></pre><p>在这个目录下，<code>.git</code>目录及其所拥有的内容都是Git的，除此之外的文件称为工作副本(<code>working copy</code>),它们属于用户，工作副本位于工作空间(<code>workspace</code>)中。</p>
+    |</code>– exclude<br>    |– objects<br>    |   |– info<br>    |   <code>-- pack</code>– refs<br>        |– heads<br>        `– tags</p>
+<p>在这个目录下，<code>.git</code>目录及其所拥有的内容都是Git的，除此之外的文件称为工作副本(<code>working copy</code>),它们属于用户，工作副本位于工作空间(<code>workspace</code>)中。</p>
 <h2 id="添加文件"><a href="#添加文件" class="headerlink" title="添加文件"></a>添加文件</h2><hr>
-<pre><code>alpha $ git add data/letter.txt</code></pre><p>用户运行将<code>data/letter.txt</code> 添加到<code>index</code>中，这步操作有两个影响：</p>
+<p>alpha $ git add data/letter.txt</p>
+<p>用户运行将<code>data/letter.txt</code> 添加到<code>index</code>中，这步操作有两个影响：</p>
 <p>第一步：Git在<code>.git/objects</code>目录下创建一个<code>blob</code>格式的文件，这个blob文件代表一个Blob对象。</p>
-<pre><code>alpha $ tree .git/objects
-.git/objects
-|-- 2e
-|   `-- 65efe2a145dda7ee51d1741299f848e5bf752e
-|-- info
-`-- pack</code></pre><p>这个blob文件包含了<code>data/letter.txt</code>文件中被压缩后的内容。文件的名来源于文件内容的哈希值。这个哈希值唯一标识了文件中的内容。例如Git 对 <code>a</code>进行哈希运行得到<code>2e65efe2a145dda7ee51d1741299f848e5bf752e</code>.这个哈希值的前两个字符用于.git/objects下的目录创建一个目录:<code>.git/objects/2e</code>.剩余的字符用于命名这个blob文件。</p>
+<p>alpha $ tree .git/objects<br>.git/objects<br>|– 2e<br>|   <code>-- 65efe2a145dda7ee51d1741299f848e5bf752e
+|-- info</code>– pack</p>
+<p>这个blob文件包含了<code>data/letter.txt</code>文件中被压缩后的内容。文件的名来源于文件内容的哈希值。这个哈希值唯一标识了文件中的内容。例如Git 对 <code>a</code>进行哈希运行得到<code>2e65efe2a145dda7ee51d1741299f848e5bf752e</code>.这个哈希值的前两个字符用于.git/objects下的目录创建一个目录:<code>.git/objects/2e</code>.剩余的字符用于命名这个blob文件。</p>
 <p>注意：刚才已经将文件添加到Git，如果用户将<code>data/letter.txt</code>从工作空间中删除，这些数据仍然安全保存在Git中。</p>
 <p>第二步：Git 将文件添加到 <code>index</code> (暂存区）中，<code>index</code>是一个列表，它包含了所有被Git追踪的文件。这个列表以文件的形式存储在<code>.git/index</code>.文件中的每一行包含着一个文件名和这个文件内容对应的哈希值，刚才<code>git add</code>后<code>index</code>文件中的添加的内容大致如下：</p>
 <pre><code># 通过文件名可以找到对就的Blob对象。
@@ -910,15 +878,15 @@ delta $ cd ../alpha
 alpha $ cat .git/HEAD
 ref: refs/heads/master
 alpha $ cat .git/refs/heads/master
-f0013185d0a45ecf7f7be00692ddfa6359954513</code></pre><p>第三，alpha/.git/refs/remotes/delta/master更新为指向commit 14.这时，alpha将自己的最新状态同步到delta中。</p>
-<p><img src="images/git-from-the-inside-out/32-14-pushed-to-delta.png" alt="Git/32-14-pushed-to-delta.png"></p>
+f0013185d0a45ecf7f7be00692ddfa6359954513</code></pre><p>第三，<code>alpha/.git/refs/remotes/delta/master</code>更新为指向<code>commit 14</code>.这时，<code>alpha</code>将自己的最新状态同步到<code>delta</code>中。</p>
+<p><img src="images/git-from-the-inside-out/32-14-pushed-to-delta.png" alt="pushed-to-delta"></p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
-<p>Git 建立在这个抽象的树形图中。几乎所有的Git命令都会操作这个树形图。要想深入理解Git，重点关注这个树形图的属性，而不是死记命令。<br>为了深入学习Git，探索.git目录中的内容是不可避免。</p>
+<p>Git 建立在这个抽象的树形图中。几乎所有的Git命令都会操作这个树形图。要想深入理解Git，重点关注这个树形图的属性，而不是死记命令。因此，为了深入学习Git，探索.git目录中的内容是不可避免。</p>
 <p>没有涉及到的命令：</p>
 <ul>
-<li>git prune →用于删除一个引用无法关联到的所有对象，如果用户运行这个命令，会导致内容的丢失。</li>
-<li>git stash → 将工作空间中与HEAD指向的提交之间的diff存储在一个安全的地方，它们可以在后面被检索出来。用于临时保存内容。</li>
-<li>git rebase → 这个命今用于添加、编辑和删除objects中存储的commit。</li>
+<li><code>git prune</code> → 用于删除一个引用无法关联到的所有对象，如果用户运行这个命令，会导致内容的丢失。</li>
+<li><code>git stash</code> → 将工作空间中与HEAD指向的提交之间的diff存储在一个安全的地方，它们可以在后面被检索出来。用于临时保存内容。</li>
+<li><code>git rebase</code> → 这个命今用于添加、编辑和删除objects中存储的commit。</li>
 </ul>
 
       
@@ -1052,7 +1020,7 @@ f0013185d0a45ecf7f7be00692ddfa6359954513</code></pre><p>第三，alpha/.git/refs
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Git-深入浅出"><span class="nav-number">1.</span> <span class="nav-text">Git 深入浅出</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建一个项目"><span class="nav-number">1.1.</span> <span class="nav-text">创建一个项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化Git仓库"><span class="nav-number">1.2.</span> <span class="nav-text">初始化Git仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加文件"><span class="nav-number">1.3.</span> <span class="nav-text">添加文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提交"><span class="nav-number">1.4.</span> <span class="nav-text">提交</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建树形图"><span class="nav-number">1.4.1.</span> <span class="nav-text">创建树形图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建一个commit对象"><span class="nav-number">1.4.2.</span> <span class="nav-text">创建一个commit对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指向当前分支最新的commit对象"><span class="nav-number">1.4.3.</span> <span class="nav-text">指向当前分支最新的commit对象</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非第一次提交的提交"><span class="nav-number">1.5.</span> <span class="nav-text">非第一次提交的提交</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#切换到一个提交"><span class="nav-number">1.6.</span> <span class="nav-text">切换到一个提交</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建一个分支"><span class="nav-number">1.7.</span> <span class="nav-text">创建一个分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#切换分支"><span class="nav-number">1.8.</span> <span class="nav-text">切换分支</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#切换到一个与当前工作空间不兼容的分支"><span class="nav-number">2.</span> <span class="nav-text">切换到一个与当前工作空间不兼容的分支</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#合并一个祖先分支"><span class="nav-number">2.1.</span> <span class="nav-text">合并一个祖先分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并一个后代分支"><span class="nav-number">2.2.</span> <span class="nav-text">合并一个后代分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并两个兄弟分支"><span class="nav-number">2.3.</span> <span class="nav-text">合并两个兄弟分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并两个来自兄弟分支且它们修改同一文件"><span class="nav-number">2.4.</span> <span class="nav-text">合并两个来自兄弟分支且它们修改同一文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除文件"><span class="nav-number">2.5.</span> <span class="nav-text">删除文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复制一个仓库"><span class="nav-number">2.6.</span> <span class="nav-text">复制一个仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#连接两个Git仓库中"><span class="nav-number">2.7.</span> <span class="nav-text">连接两个Git仓库中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从远程仓库中取出一个分支"><span class="nav-number">2.8.</span> <span class="nav-text">从远程仓库中取出一个分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并FETCH-HEAD"><span class="nav-number">2.9.</span> <span class="nav-text">合并FETCH_HEAD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从-远程仓库中拉取一个分支"><span class="nav-number">2.9.1.</span> <span class="nav-text">从 远程仓库中拉取一个分支</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复制一个仓库-1"><span class="nav-number">2.10.</span> <span class="nav-text">复制一个仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#推送分支到远程仓库中一个被签出的分支中"><span class="nav-number">2.11.</span> <span class="nav-text">推送分支到远程仓库中一个被签出的分支中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#克隆一个bare仓库"><span class="nav-number">2.12.</span> <span class="nav-text">克隆一个bare仓库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#推送一个分支到bare仓库中"><span class="nav-number">2.12.1.</span> <span class="nav-text">推送一个分支到bare仓库中</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">2.13.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建一个项目"><span class="nav-number">1.</span> <span class="nav-text">创建一个项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化Git仓库"><span class="nav-number">2.</span> <span class="nav-text">初始化Git仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加文件"><span class="nav-number">3.</span> <span class="nav-text">添加文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提交"><span class="nav-number">4.</span> <span class="nav-text">提交</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建树形图"><span class="nav-number">4.1.</span> <span class="nav-text">创建树形图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建一个commit对象"><span class="nav-number">4.2.</span> <span class="nav-text">创建一个commit对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指向当前分支最新的commit对象"><span class="nav-number">4.3.</span> <span class="nav-text">指向当前分支最新的commit对象</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非第一次提交的提交"><span class="nav-number">5.</span> <span class="nav-text">非第一次提交的提交</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#切换到一个提交"><span class="nav-number">6.</span> <span class="nav-text">切换到一个提交</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建一个分支"><span class="nav-number">7.</span> <span class="nav-text">创建一个分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#切换分支"><span class="nav-number">8.</span> <span class="nav-text">切换分支</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#切换到一个与当前工作空间不兼容的分支"><span class="nav-number"></span> <span class="nav-text">切换到一个与当前工作空间不兼容的分支</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#合并一个祖先分支"><span class="nav-number">1.</span> <span class="nav-text">合并一个祖先分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并一个后代分支"><span class="nav-number">2.</span> <span class="nav-text">合并一个后代分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并两个兄弟分支"><span class="nav-number">3.</span> <span class="nav-text">合并两个兄弟分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并两个来自兄弟分支且它们修改同一文件"><span class="nav-number">4.</span> <span class="nav-text">合并两个来自兄弟分支且它们修改同一文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除文件"><span class="nav-number">5.</span> <span class="nav-text">删除文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复制一个仓库"><span class="nav-number">6.</span> <span class="nav-text">复制一个仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#连接两个Git仓库中"><span class="nav-number">7.</span> <span class="nav-text">连接两个Git仓库中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从远程仓库中取出一个分支"><span class="nav-number">8.</span> <span class="nav-text">从远程仓库中取出一个分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并FETCH-HEAD"><span class="nav-number">9.</span> <span class="nav-text">合并FETCH_HEAD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从-远程仓库中拉取一个分支"><span class="nav-number">9.1.</span> <span class="nav-text">从 远程仓库中拉取一个分支</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复制一个仓库-1"><span class="nav-number">10.</span> <span class="nav-text">复制一个仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#推送分支到远程仓库中一个被签出的分支中"><span class="nav-number">11.</span> <span class="nav-text">推送分支到远程仓库中一个被签出的分支中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#克隆一个bare仓库"><span class="nav-number">12.</span> <span class="nav-text">克隆一个bare仓库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#推送一个分支到bare仓库中"><span class="nav-number">12.1.</span> <span class="nav-text">推送一个分支到bare仓库中</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">13.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
