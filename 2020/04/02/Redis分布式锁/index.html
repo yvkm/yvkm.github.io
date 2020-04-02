@@ -1,0 +1,334 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Redis分布式锁 | yvkm</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="为什么要使用分布式锁？使用锁的目的是确保在可能尝试执行同一工作的多个节点中，只有一个节点实际执行。这项工作可能是将数据写入共享的存储系统，可能是执行一些计算，调用某些外部API等。从高层次上讲，在分布式应用程序中使用锁有两个原因：效率和正确性。  效率: 锁可以避免不必要地重复执行两次相同的工作(例如，一些昂贵的计算).如果锁定失败并且两个节点最终完成相同的工作，则成本会增加(计算多一次所产生的费">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis分布式锁">
+<meta property="og:url" content="http://github.com/yvkm/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/index.html">
+<meta property="og:site_name" content="yvkm">
+<meta property="og:description" content="为什么要使用分布式锁？使用锁的目的是确保在可能尝试执行同一工作的多个节点中，只有一个节点实际执行。这项工作可能是将数据写入共享的存储系统，可能是执行一些计算，调用某些外部API等。从高层次上讲，在分布式应用程序中使用锁有两个原因：效率和正确性。  效率: 锁可以避免不必要地重复执行两次相同的工作(例如，一些昂贵的计算).如果锁定失败并且两个节点最终完成相同的工作，则成本会增加(计算多一次所产生的费">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/redis-lock/unsafe-lock.png">
+<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/redis-lock/fencing-tokens.png">
+<meta property="article:published_time" content="2020-04-02T11:29:40.047Z">
+<meta property="article:modified_time" content="2020-04-02T14:35:26.437Z">
+<meta property="article:author" content="yvkm">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://github.com/yvkm/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/redis-lock/unsafe-lock.png">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">yvkm</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">&lt;3 code.</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="github.com/yvkm">
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    
+    document.getElementById("banner").style.backgroundImage = "url(/css/images/banner.jpg)";
+    
+</script>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-Redis分布式锁" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" class="article-date">
+  <time datetime="2020-04-02T11:29:40.047Z" itemprop="datePublished">2020-04-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Redis/">Redis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Redis分布式锁
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>为什么要使用分布式锁？<br>使用锁的目的是确保在可能尝试执行同一工作的多个节点中，只有一个节点实际执行。这项工作可能是将数据写入共享的存储系统，可能是执行一些计算，调用某些外部API等。从高层次上讲，在分布式应用程序中使用锁有两个原因：<strong>效率</strong>和<strong>正确性</strong>。</p>
+<ul>
+<li><strong>效率</strong>: 锁可以避免不必要地重复执行两次相同的工作(例如，一些昂贵的计算).如果锁定失败并且两个节点最终完成相同的工作，则成本会增加(计算多一次所产生的费用)或带有不便(用户最终两次收到相同的邮件).</li>
+<li><strong>正确性</strong>： 锁可以防止并发的进程扰乱系统的状态，如果锁定失败，并且两个节点同时处理一条数据，则结果是数据丢失、永久性不一致、文件损坏、给患者的药物剂量错误等其他严重的问题。<br>在使用锁时，你需要非常清楚在哪种情况下。</li>
+</ul>
+<p>下面使用Redis实现分布式锁，从简单到复杂，解析其中存在的问题。</p>
+<h2 id="level-1"><a href="#level-1" class="headerlink" title="level 1"></a>level 1</h2><hr>
+<p><code>setnx</code> + <code>del</code></p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ setnx <span class="keyword">lock</span> <span class="literal">true</span></span><br><span class="line">... <span class="keyword">do</span> something</span><br><span class="line">$ del <span class="keyword">lock</span></span><br></pre></td></tr></table></figure>
+<p><strong>存在问题</strong></p>
+<ul>
+<li>如果在<code>setnx</code>和<code>del</code>之间出现异常，导致<code>del</code>没有执行，这样锁不会被释放了。</li>
+</ul>
+<h2 id="level-2"><a href="#level-2" class="headerlink" title="level 2"></a>level 2</h2><hr>
+<p><code>setnx</code> + <code>expire</code> + <code>del</code></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ setnx <span class="keyword">lock</span> <span class="literal">true</span></span><br><span class="line">$ <span class="keyword">expire</span> <span class="keyword">lock</span> <span class="number">5</span></span><br><span class="line">... <span class="keyword">do</span> something</span><br><span class="line">$ del <span class="keyword">lock</span></span><br></pre></td></tr></table></figure>
+<p><strong>存在问题</strong></p>
+<ul>
+<li>如果<code>setnx</code>和<code>expire</code>之间服务器进程突然停止，锁同样不会被释放。根源在于<code>setnx</code>和<code>expire</code>是两条指令。</li>
+</ul>
+<h2 id="level-3"><a href="#level-3" class="headerlink" title="level 3"></a>level 3</h2><hr>
+<p><code>set</code>扩展参数 + <code>del</code></p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="keyword">set</span> <span class="keyword">lock</span> <span class="literal">true</span> ex <span class="number">5</span> nx</span><br><span class="line">... <span class="keyword">do</span> something</span><br><span class="line">$ del <span class="keyword">lock</span></span><br></pre></td></tr></table></figure>
+<p><strong>存在问题</strong></p>
+<ul>
+<li>超时问题：如果线程1在<code>set</code>和<code>del</code>之间执行的时间超过5s, 这时锁已经过期了。线程2可以重新设置这把锁,问题出现在，线程1竟然去释放了线程2设置的锁，这时假如线程3申请加锁，就会通过。因此，redis分布式锁不要用于执行较长的任务。</li>
+</ul>
+<h2 id="level-4"><a href="#level-4" class="headerlink" title="level 4"></a>level 4</h2><hr>
+<p>通过对比加锁前和删除锁前的随机数值是否一致再删除key。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 伪码</span><br><span class="line">flag = Random.nextInt();</span><br><span class="line"><span class="keyword">if</span> (redis.set(key, flag, nx=<span class="keyword">true</span>, ex=<span class="number">5</span>)) &#123;</span><br><span class="line">	doSomething();</span><br><span class="line">	redis.delIfEquals(key, tag); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Redis不存在delIfEquals这样的指令.需要Lua脚本来处理，因为Lua脚本可以保证连接多个指令的原子性。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># defIfEquals</span><br><span class="line"><span class="keyword">if</span> redis.call(<span class="string">"get"</span>, KEYS[<span class="number">1</span>] == ARGS[<span class="number">1</span>]) <span class="keyword">then</span></span><br><span class="line">	<span class="keyword">return</span> redis.call(<span class="string">"del"</span>, KEYS[<span class="number">1</span>]) </span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>存在问题</strong></p>
+<ul>
+<li>如果线程在持有锁的情况下再次请求加锁,目前是没有办法完成的。即存在可重入问题。</li>
+</ul>
+<h2 id="level-5"><a href="#level-5" class="headerlink" title="level 5"></a>level 5</h2><hr>
+<p>基于ThreadLocal和引用计数实现可重入锁</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisReentrantLock</span> </span>&#123;</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 当前线程持有的锁(String)和引用数(Integer)</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">private</span> ThreadLocal&lt;Map&lt;String,Integer&gt;&gt; currentLockers = <span class="keyword">new</span> ThreadLocal&lt;&gt;();</span><br><span class="line">	<span class="keyword">private</span> Jedis jedis;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">RedisReentrantLock</span><span class="params">(Jedis jedis)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.jedis = jedis;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">_lock</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> jedis.set(key, <span class="string">""</span>, <span class="string">"nx"</span>, <span class="string">"ex"</span>, <span class="number">5L</span>) != <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function">publci <span class="keyword">void</span> <span class="title">_unlock</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">		jedis.del(key);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> Map&lt;String Integer&gt; currentLockers() &#123;</span><br><span class="line">		Map&lt;String,Integer&gt; refs = currentLockers.get();</span><br><span class="line">		<span class="keyword">if</span>(refs != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> refs;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 初始化ThreadLocal </span></span><br><span class="line">		lockers.set(<span class="keyword">new</span> HashMap&lt;&gt;());</span><br><span class="line">		<span class="keyword">return</span> lockers.get();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">lock</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">		Map&lt;String Integer&gt; refs = currentLockers()</span><br><span class="line">		Integer refCnt = refs.get(key);</span><br><span class="line">		<span class="comment">// 如果不为空，说明已经加过锁,引用数加1，并返回.</span></span><br><span class="line">		<span class="keyword">if</span>(refCnt != <span class="keyword">null</span>) &#123;</span><br><span class="line">			refs.put(key, refCnt+<span class="number">1</span>);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 如果refCnt为空，说明首次加锁</span></span><br><span class="line">		<span class="keyword">boolean</span> ok = <span class="keyword">this</span>._lock(key);</span><br><span class="line">		<span class="keyword">if</span>(!ok) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 加锁完成</span></span><br><span class="line">		refs.put(key, <span class="number">1</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">unlock</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">		Map&lt;String Integer&gt; refs = currentLockers();</span><br><span class="line">		Integer refCnt = refs.get(key);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 引用数为空是不可能解锁的</span></span><br><span class="line">		<span class="keyword">if</span>(refCnt ==<span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		refCnt -= <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">if</span>(refCnt &gt; <span class="number">0</span>) &#123;</span><br><span class="line">			refs.put(key, refCnt);</span><br><span class="line">		&#125;<span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// 引用数为空，删除锁</span></span><br><span class="line">			refs.remove(key);</span><br><span class="line">			<span class="keyword">this</span>._unlock(key);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>存在问题</strong></p>
+<ul>
+<li>加入可重入性后复杂度明显提高，而且上面的代码并不完善，还需要考虑过期问题,添加随机数。通常在编写业务方法时，可以通过调整业务逻辑结构来避免可重入锁的使用。</li>
+<li>在集群环境下不安全，在Sentinel集群中，主节点挂掉，从节点会取而代之，但客户端是无法知道的。如果线程在主节点为成功申请了一把锁了，但是这把锁没有来得及同步到从节点就挂掉。然后从节点变成主节点，这个新节点并没有这把锁，所以另外一个线程请求加锁会立即成功。这样导致系统中同样一把锁被两个线程持有。幸运的是，这种不安全仅会在故障转移(failover)下会产生，而且时间极短，业务系统多数情况可以容忍。</li>
+</ul>
+<h2 id="level-6"><a href="#level-6" class="headerlink" title="level 6"></a>level 6</h2><hr>
+<p>Antirez在Redis中实现了Redlock算法可以解决上述问题，但是流程比较复杂。好在很多开源的libary做了良好的封装，开箱即用。为了使用Redlock，需要提供多个Redis实例，这些实例之前相互独立没有主从关系，同很多分布式算法一样，Redlock也使用所谓的<strong>大多数机制</strong>。</p>
+<p>加锁时，它会向过半节点发送<code>set(key, value, nx=true,ex=xx)</code>指令，只要过半节点set成功，那就认为加锁成功。释放锁时，需要所有节点发送del指令。不过Redlock算法还需要考虑出错重试，时钟漂移等众多细节问题，同时因为Redlock需要向多个节点进行读写，意味着相比单实例Redis性能会下降。<br><strong>权衡</strong><br>如果很在乎高可用性，希望挂一个redis实例完全不受影响,那么就应该考虑使用Redlock.其代价是，需要更多的Redis实例，带来的是性能的下降，并且代码上还需要引入额外的libary，运维上也需要特殊对待，这些都是应该纳入考虑的成本。</p>
+<h2 id="争议"><a href="#争议" class="headerlink" title="争议"></a>争议</h2><p>Martin在<a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html" target="_blank" rel="noopener">how to build distributed locking</a>一文中认为：RedLock虽然已经提供了相当完美的锁服务，但在Java的应用中，JVM的GC可是随时都有可能运行的，一个节点完全有可能在获取锁后由于GC的原因(<code>stop-the-world</code>)，导致暂停很长的时间以致锁超时了。此时这个节点并没有意识到锁已经超时，它可能会继续进行一些不安全的操作。<br><img src="images/redis-lock/unsafe-lock.png" alt="由于GC引起的锁超时问题"></p>
+<p>他认为，引入一个标记(token)来保护锁，标记就是一个递增的数字，每次获得锁后递增一次。<br><img src="images/redis-lock/fencing-tokens.png" alt="利用标记保护锁"></p>
+<p>当客户端1成功锁时，还获取到一个33号标记,随后它进行长暂停，锁随之超时。其后，客户端2获得锁和34号标记，然后进行存储操作。当客户端1恢复执行时，进行存储操作，然而存储服务器记住它已经处理了具有更高标记的操作(34),因此拒绝执行客户端1的请求。然而，这种RedLock并不提供生成标记的操作。</p>
+<p>而Antiez对这篇文章提出了一些反驳的观点<a href="http://antirez.com/news/101" target="_blank" rel="noopener">Is Redlock safe</a>?</p>
+<p>内容来自：</p>
+<ul>
+<li>Redis尝试历险：核心原理和应用实践</li>
+<li><a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html" target="_blank" rel="noopener">how to do distributed locking</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://github.com/yvkm/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" data-id="ck8isuexa000048ap0l5l4694" class="article-share-link" data-share="baidu" data-title="Redis分布式锁">分享到</a>
+      
+
+      
+
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/" rel="tag">redis</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/04/02/Git%20from%20the%20inside%20out/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">深入浅出Git原理</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Git/">Git</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Redis/">Redis</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/" rel="tag">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">Redis分布式锁</a>
+          </li>
+        
+          <li>
+            <a href="/2020/04/02/Git%20from%20the%20inside%20out/">深入浅出Git原理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 yvkm<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+</div>
+</body>
+</html>
