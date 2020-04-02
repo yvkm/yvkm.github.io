@@ -13,40 +13,11 @@
 <meta property="og:site_name" content="Yvkm">
 <meta property="og:description" content="经作者同意翻译成中文，有所增删。原文链接 本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。 本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在Git的真正实现上。从Git的实现角度去理解Git可以让你更加清楚Git做了什么，它正在做什么，它将要做什么。 创建一个项目">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/3-a1-refs.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/4-a1-wc-and-index.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/5-a1-wc-number-set-to-2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/6-a1-wc-and-index-number-set-to-2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/7-a2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/9-a2-detached-head.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/10-a3-detached-head.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/11-a3-on-deputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/12-a3-on-master-on-a2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/13-a3ondeputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/14-a3-on-master-on-a2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/15-a3-on-master.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/16-a4-b3-on-deputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/17-a4-b3-on-deputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/18-b4-on-deputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/19-b4-master-deputy-on-b4.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/20-b5-on-deputy-b6-on-master.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/21-b6-on-master-with-merge-head.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/23-b11-with-objects-wc-and-index.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/24-b11-letter-removed-from-wc-and-index.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/25-11.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/26-11-cp-alpha-to-bravo.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/27-12-bravo.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/28-12-fetched-to-alpha.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/29-12-merged-to-alpha.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/30-13-alpha-cloned-to-delta-bare.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/31-14-alpha.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/32-14-pushed-to-delta.png">
-<meta property="article:published_time" content="2020-04-02T03:46:19.339Z">
-<meta property="article:modified_time" content="2020-04-02T05:12:17.549Z">
+<meta property="article:published_time" content="2020-04-02T05:47:11.859Z">
+<meta property="article:modified_time" content="2020-04-02T05:50:00.381Z">
 <meta property="article:author" content="yvkm">
 <meta property="article:tag" content="git">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://github.com/yvkm/2020/04/02/Git/images/git-from-the-inside-out/3-a1-refs.png">
   
   
     <link rel="icon" href="/favicon.png">
@@ -108,7 +79,7 @@
       <section id="main"><article id="post-Git" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/04/02/Git/" class="article-date">
-  <time datetime="2020-04-02T03:46:19.339Z" itemprop="datePublished">2020-04-02</time>
+  <time datetime="2020-04-02T05:47:11.859Z" itemprop="datePublished">2020-04-02</time>
 </a>
     
   <div class="article-category">
@@ -197,432 +168,751 @@
 <p>下面是<code>git commit</code>生成的三个对象及内容。</p>
 <figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">alpha $ tree .git/objects</span><br><span class="line"><span class="comment"># 比之前多了下面三个对象。</span></span><br><span class="line">.git/objects</span><br><span class="line">|<span class="comment">-- ... </span></span><br><span class="line">|<span class="comment">-- 0e</span></span><br><span class="line">|   `<span class="comment">-- ed1217a2947f4930583229987d90fe5e8e0b74</span></span><br><span class="line">|<span class="comment">-- a8</span></span><br><span class="line">|   `<span class="comment">-- 9ea183a48e484c318335fd25c8adcc82608c35</span></span><br><span class="line">|<span class="comment">-- ff</span></span><br><span class="line">|   `<span class="comment">-- e298c3ce8bb07326f888907996eaa48d266db4</span></span><br><span class="line">|<span class="comment">-- info</span></span><br><span class="line">`<span class="comment">-- pack</span></span><br></pre></td></tr></table></figure>
 
-<p>检查文件的类型及数据</p>
-<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alpha</span> $ git <span class="keyword">cat</span>-<span class="keyword">file</span> -t 0eed</span><br><span class="line">tree</span><br><span class="line"><span class="keyword">alpha</span> $ git <span class="keyword">cat</span>-<span class="keyword">file</span> -p 0eed</span><br><span class="line">100644 blob 2e65efe2a145dda7ee51d1741299f848e5bf752e    letter.txt</span><br><span class="line">100644 blob 56a6051ca2b02b04ef92d5150c9ef600403cb1de    number.txt</span><br><span class="line"><span class="keyword">alpha</span> $ git <span class="keyword">cat</span>-<span class="keyword">file</span> -t ffe2</span><br><span class="line">tree</span><br><span class="line"><span class="keyword">alpha</span> $ git <span class="keyword">cat</span>-<span class="keyword">file</span> -p **ffe2**</span><br><span class="line">040000 tree **0eed**1217a2947f4930583229987d90fe5e8e0b74    data</span><br><span class="line">```    </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">从上面可以看到 tree对象`ffe2`指向 tree对象 `0eed`</span><br><span class="line">tree对象`0eed`中的内容，它代表了`data`目录</span><br></pre></td></tr></table></figure>
-
-<p>100644 blob 2e65efe2a145dda7ee51d1741299f848e5bf752e    letter.txt<br>100644 blob 56a6051ca2b02b04ef92d5150c9ef600403cb1de    number.txt</p>
-<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">上面的第一条记录了用于重新的生成`data/letter.txt`文件的所有信息。这条记录分为四部分：第一部分 `100644`表示文件的权限。第二部分 blob表示这个文件的内容由blob表示，而不是tree。第三部分 表示这个blob的哈希值。第四部分表示文件名。</span><br><span class="line"></span><br><span class="line">第二条记录类似第一条。</span><br><span class="line"></span><br><span class="line">tree对象`ffe2`表示`alpha`目录，它表示项目的根目录</span><br></pre></td></tr></table></figure>
+<p>检查文件的类型及数据<br>从下面可以看到 tree对象<code>ffe2</code>指向 tree对象 <code>0eed</code>,tree对象<code>0eed</code>中的内容，它代表了<code>data</code>目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">alpha $ git cat-file -t 0eed</span><br><span class="line">tree</span><br><span class="line">alpha $ git cat-file -t ffe2</span><br><span class="line">tree</span><br><span class="line">alpha $ git cat-file -p 0eed</span><br><span class="line">100644 blob 2e65efe2a145dda7ee51d1741299f848e5bf752e    letter.txt</span><br><span class="line">100644 blob 56a6051ca2b02b04ef92d5150c9ef600403cb1de    number.txt</span><br><span class="line">alpha $ git cat-file -p ffe2</span><br><span class="line">040000 tree 0eed 1217a2947f4930583229987d90fe5e8e0b74    data</span><br><span class="line">&#96;&#96;&#96;    </span><br><span class="line"></span><br><span class="line">其中&#96;100644 blob 2e65efe2a145dda7ee51d1741299f848e5bf752e    letter.txt&#96;记录了用于重新的生成&#96;data&#x2F;letter.txt&#96;文件的所有信息。</span><br><span class="line">这条记录分为四部分：第一部分 &#96;100644&#96;表示文件的权限。第二部分 blob表示这个文件的内容由blob表示，而不是tree。第三部分 表示这个blob的哈希值。第四部分表示文件名。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">tree对象&#96;ffe2&#96;表示&#96;alpha&#96;目录，它表示项目的根目录</span><br></pre></td></tr></table></figure>
 <p>alpha $ git cat-file -p ffe2<br>040000 tree 0eed1217a2947f4930583229987d90fe5e8e0b74</p>
 <figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="code">`commit a1`</span> 提交的树形图可以用图表示为</span><br><span class="line"></span><br><span class="line">![<span class="string">a1提交的树形图</span>](<span class="link">images/git-from-the-inside-out/1-a1-tree-graph.png</span>)</span><br><span class="line"></span><br><span class="line"><span class="section">### 创建一个commit对象</span></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line"><span class="code">`git commit`</span>在创建完上面的树形图后创建一个commit对象。这个commit对象同样存储在<span class="code">`.git/objects`</span>中</span><br></pre></td></tr></table></figure>
-<p>alpha $ git cat-file -t a89e<br>commit<br>alpha $ git cat-file -p a89e<br>tree ffe298c3ce8bb07326f888907996eaa48d266db4<br>author xiejianxun <a href="mailto:&#120;&#x69;&#101;&#106;&#105;&#97;&#110;&#120;&#117;&#110;&#64;&#x6f;&#117;&#116;&#x6c;&#x6f;&#x6f;&#107;&#x2e;&#99;&#111;&#109;&#109;">&#120;&#x69;&#101;&#106;&#105;&#97;&#110;&#120;&#117;&#110;&#64;&#x6f;&#117;&#116;&#x6c;&#x6f;&#x6f;&#107;&#x2e;&#99;&#111;&#109;&#109;</a> 1583742597 +0800<br>committer xiejianxun <a href="mailto:&#120;&#105;&#x65;&#106;&#x69;&#97;&#110;&#120;&#x75;&#110;&#64;&#x6f;&#x75;&#x74;&#x6c;&#x6f;&#x6f;&#107;&#x2e;&#x63;&#111;&#109;&#x6d;">&#120;&#105;&#x65;&#106;&#x69;&#97;&#110;&#120;&#x75;&#110;&#64;&#x6f;&#x75;&#x74;&#x6c;&#x6f;&#x6f;&#107;&#x2e;&#x63;&#111;&#109;&#x6d;</a> 1583742597 +0800</p>
+<p>alpha $ git cat-file -t a89e<br>commit<br>alpha $ git cat-file -p a89e<br>tree ffe298c3ce8bb07326f888907996eaa48d266db4<br>author xiejianxun <a href="mailto:&#120;&#x69;&#101;&#106;&#105;&#x61;&#x6e;&#120;&#117;&#x6e;&#64;&#111;&#117;&#x74;&#108;&#111;&#x6f;&#x6b;&#x2e;&#x63;&#x6f;&#109;&#109;">&#120;&#x69;&#101;&#106;&#105;&#x61;&#x6e;&#120;&#117;&#x6e;&#64;&#111;&#117;&#x74;&#108;&#111;&#x6f;&#x6b;&#x2e;&#x63;&#x6f;&#109;&#109;</a> 1583742597 +0800<br>committer xiejianxun <a href="mailto:&#x78;&#105;&#x65;&#x6a;&#105;&#97;&#110;&#x78;&#x75;&#110;&#64;&#111;&#x75;&#x74;&#x6c;&#111;&#111;&#x6b;&#x2e;&#x63;&#x6f;&#x6d;&#109;">&#x78;&#105;&#x65;&#x6a;&#105;&#97;&#110;&#x78;&#x75;&#110;&#64;&#111;&#x75;&#x74;&#x6c;&#111;&#111;&#x6b;&#x2e;&#x63;&#x6f;&#x6d;&#109;</a> 1583742597 +0800</p>
 <figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">第一行指定向了树形图。这个哈希值上面有提到，它就是表示项目的根目录。在当前环境下，就是<span class="code">`alpha`</span>目录。最后一行表示提交的信息。</span><br><span class="line"></span><br><span class="line">![<span class="string">commit a1对应的commit对象指向的树形图</span>](<span class="link">images/git-from-the-inside-out/2-a1-commit.png</span>)</span><br><span class="line"></span><br><span class="line"><span class="section">### 指向当前分支最新的commit对象</span></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line"><span class="code">`git command`</span>最后要做的是将指向当前分支的最新的commit对象</span><br><span class="line"></span><br><span class="line">那么，哪里记录着当前分支呢？在Git中，HEAD 文件记录着当前工作的分支，文件位于<span class="code">`.git/HEAD`</span></span><br></pre></td></tr></table></figure>
 <h1 id="heads下记录了当前仓库拥有哪些分支"><a href="#heads下记录了当前仓库拥有哪些分支" class="headerlink" title="heads下记录了当前仓库拥有哪些分支"></a>heads下记录了当前仓库拥有哪些分支</h1><p>alpha $ cat .git/HEAD<br>ref: refs/heads/master</p>
 <figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">`HEAD`中记录着它指向了`master`分支，也就是说`master`就是当前正在工作的分支。</span><br><span class="line"></span><br><span class="line">`HEAD`和`master`都是引用.`引用`就是Git使用的一个标签或用户用于标识特定提交的`tag`。</span><br></pre></td></tr></table></figure>
 <p>alpha $ cat .git/refs/heads/master<br>a89ea183a48e484c318335fd25c8adcc82608c35<br>alpha $ git cat-file -t a89e<br>commit</p>
-<p>```<br>master文件中存储了一个哈希值，它表示一个commit对象。(这个哈希值可能不一致，因为它包含提交用户的信息）</p>
-<p>将<code>HEAD</code>和<code>master</code>添加到Git的树形图中，结果是：</p>
-<p><img src="images/git-from-the-inside-out/3-a1-refs.png" alt="HEAD指向master，master指向commit a1"></p>
-<p>Git 对象都是存储在特殊的文件中(需要<code>git cat-file</code>才能查看里面的内容），<code>master</code>和<code>HEAD</code>存储在普通的文件中(直接用<code>cat</code>命令可以查看内容）</p>
-<p>注意：<code>HEAD</code>指向<code>master</code>在commit之前已经完成。<code>master</code>现在指定了最新的commit对象。</p>
-<p>以上是第一次提交的情况。</p>
-<h2 id="非第一次提交的提交"><a href="#非第一次提交的提交" class="headerlink" title="非第一次提交的提交"></a>非第一次提交的提交</h2><hr>
-<p><img src="images/git-from-the-inside-out/4-a1-wc-and-index.png" alt="commit a1与工作空间和index之间的关系"></p>
-<p>上面是一个包含工作空间和<code>index</code>(暂存区的树形图）</p>
-<p>现在workspace、index和commit a1中的<code>data/letter.txt</code>和<code>data/number.txt</code>都含有相同的内容分别为<code>a</code>和<code>1</code>. <code>index</code>和<code>HEAD</code>都使用哈希值指定它们引用的blob对象，但是工作空间中的内容是用文本存储在不同的地方(即不是.git/objects中）。</p>
-<p>执行以下的命令后，</p>
-<pre><code>alpha $ printf &apos;2&apos; &gt; data/number.txt
-alpha $ git add data/number.txt</code></pre><p>树形图会发生变化:首先工作空间中的data/number.txt文件发生变化，内容从1变成2. idnex不会变化。</p>
-<p><img src="images/git-from-the-inside-out/5-a1-wc-number-set-to-2.png" alt="5-a1-wc-number-set-to-2.png"></p>
-<p>执行<code>git add</code>后，index变化。它会在<code>.git/objects</code>下创建一个blob对象，这个对象存储着2.然后，<code>index</code>中的关于<code>data/number.txt</code>的条目的哈希值更改为这个新生成的blob对象的哈希值。</p>
-<p><img src="images/git-from-the-inside-out/6-a1-wc-and-index-number-set-to-2.png" alt="6-a1-wc-and-index-number-set-to-2.png"></p>
-<pre><code>alpha $ git commit -m &apos;a2&apos;
-[master 8734e79] a2
- 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre><p>用户再次执行commit后，产生的影响与之后的commit一样.</p>
-<p>首先，创建一个新的树形图表示index中的内容。</p>
-<p>index中的关于data/number.txt的条目发生了变化。代表data目录的旧tree对象将不能表示现在index中表示的状态。所有需要生成一个新的tree 对象。</p>
-<pre><code>alpha $ git cat-file -p 40b0
-100644 blob 2e65efe2a145dda7ee51d1741299f848e5bf752e    letter.txt
-100644 blob d8263ee9860594d2806b0dfd1bfd17528b0ba2a4    number.txt # 与之前的不同</code></pre><p>新的表示<code>data</code>的tree对象的哈希值与旧的不同。因此新的<code>root</code> tree对象也需要生成</p>
-<pre><code>alpha $ git cat-file -p ce72
-040000 tree 40b0318811470aaacc577485777d7a6780e51f0b    data</code></pre><p>然后，生成一个新的commit对象：</p>
-<pre><code>alpha $ git cat-file -p 8734
-tree ce72afb5ff229a39f6cce47b00d1b0ed60fe3556
-parent a89ea183a48e484c318335fd25c8adcc82608c35
-author xiejianxun &lt;xiejianxun@outlook.comm&gt; 1583753450 +0800
-committer xiejianxun &lt;xiejianxun@outlook.comm&gt; 1583753450 +0800
+<pre><code>master文件中存储了一个哈希值，它表示一个commit对象。(这个哈希值可能不一致，因为它包含提交用户的信息）
 
-a2</code></pre><p>第一行指向了新的root tree对象。第二行指向了a1 commit对象。它是a2 commit对象的父亲。为了在生成新的 a2 commit对象，Git需要先找到父commit对象：Git首先找到HEAD，通过HEAD定位到master，然后通过master找到a1 commit对象。</p>
-<p>最后，master文件中的内容修改为指定新的commit对象。</p>
-<p><img src="images/git-from-the-inside-out/7-a2.png" alt="7-a2.png"></p>
-<p>从上图可以看出，在a2 commit时，data/letter.txt会利用a1 commit中的blob对象，这样可以减少空间占用。</p>
-<p><strong>树形图属性：</strong>项目的内容存储在对象树中。这意味着Git只会存储修改的文件。如果目录下所有文件都没有修改，则会复用整个tree 对象。通常情况下，每次的提供通常只会修改少量内容，所以即使提交了大量commit，空间不会占用太多。</p>
-<p><strong>树形图属性：</strong>每个commit都有一个父commit(当然，第一个commit没有)。这意味着仓库可以存储项目的整个历史。</p>
-<p><strong>树形图属性：</strong>引用是历史提交版本的入口。这意味着每次提交都可以指定一个人意义的名称。Git使用如<code>HEAD</code>、<code>MEGRE_HEAD</code>、<code>FETCH_HEAD</code></p>
-<p>之类的引用来支持操作提交历史的命令。</p>
-<p>树形图属性：<code>.git/objects</code>下的所有文件是不可修改的。这意味着内容只会被修改，不会被删除。也就是说每次添加和commit的内容都会储存在objects目录下。</p>
-<p>树形图属性：引用是可以修改的。比如master当前可能指向目前项目中最好的提交版本，但是，很快就会有更好的提交版本，所以master又会指向这个新提交的版本。</p>
-<p>树形图属性：工作空间和引用指向的提交是随时准备好被读取的，但是其他提交版本不是，以上图为例，a2 commit的内容可以通过ckeckout 立即读取到，而a1则不能，还需要查看。</p>
-<p>在没有git add之前，Git不会保存用户做的任何修改。</p>
-<p>HEAD是最容易变化的引用。</p>
-<p>如果一个提交没有被任何引用记录，将会很难切换到这个提交的版本。</p>
-<h2 id="切换到一个提交"><a href="#切换到一个提交" class="headerlink" title="切换到一个提交"></a>切换到一个提交</h2><pre><code>alpha $ git reflog
-8734e79 (HEAD -&gt; master) HEAD@{0}: commit: a2
-a89ea18 HEAD@{1}: commit (initial): a1
-alpha $ **git checkout 8734**
-Note: switching to &apos;8734&apos;.
+将`HEAD`和`master`添加到Git的树形图中，结果是：
 
-You are in &apos;detached HEAD&apos; state.</code></pre><p>用户通过哈希值切换到a2 commit.(通过git log或reflog可以找到提交的哈希值。</p>
-<p>Checkout命令分为四个步骤：</p>
-<p>第一，Git找到在.git/objects通过ckeckOut命令中的哈希值找到对应的commit对象(a2 commit 对象)和它指向的树形图。</p>
-<p>第二，Git将树形图中的tree对象和blob对象变成工作空间中相应的目录和文件。由于HEAD通过master已经指向了a2 commit，所有工作空间中的文件不会有变化。</p>
-<p>第三，Git将更新index中的条目，由于文件没有变化所以index中的内容也没有变化。</p>
-<p>第四，HEAD文件中的内容将会设置会a2 commit的哈希值。</p>
-<pre><code>alpha $ cat .git/HEAD
-8734e794c8a443c0dc3e04cc91a2f835c77b2c9d
-alpha $ git status
-HEAD detached at 8734e79
-nothing to commit, working tree clean</code></pre><p>将HEAD的内容设置为一个哈希值将会使Git仓库进入分离头指针状态( detached HEAD state).</p>
-<p>从下图可以看出，<code>HEAD</code>直接指向了<code>a2</code> commit,而不是master。</p>
-<p><img src="images/git-from-the-inside-out/9-a2-detached-head.png" alt="9-a2-detached-head.png"></p>
-<pre><code>alpha $ printf &apos;3&apos; &gt; data/number.txt
-alpha $ git add data/number.txt
-alpha $ git commit -m &apos;a3&apos;
-[detached HEAD 50ac643] a3
- 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre><p>用户将data/number.txt中的内容改变成3，并提交这次更改。Git通过HEAD找到这次提交的父commit。这次查找父commit不会再通过分支引用查找，因为HEAD中直接存储的就是commit对象的哈希值。它返回的是a2 commit对象的哈希值。</p>
-<p>Git更新的HEAD的值，HEAD同样直接指向了a3 commit。仓库依然处于detached HEAD 状态。a3 commit 不在任何分支中，这样一旦HEAD从新指向a2, a3 commit就会很容易丢失，因为没有任何其他引用指向这次引用。</p>
-<p>这次提交的示意图如下(省略了a3 commit的tree &amp; blob对象）：</p>
-<p><img src="images/git-from-the-inside-out/10-a3-detached-head.png" alt="10-a3-detached-head.png"></p>
-<h2 id="创建一个分支"><a href="#创建一个分支" class="headerlink" title="创建一个分支"></a>创建一个分支</h2><pre><code>alpha $ git branch deputy</code></pre><p>用户创建了一个新分支：deputy。这条命令会创建一个新的文件.git/refs/heads/deputy，deputy文件中存储着HEAD的指向的commit对象的哈希值。在这是就是a3 commit的哈希值。</p>
-<p>树形图属性：分支就是引用，而引用就是文件，文件中存储着commit的哈希值。这意味着Git的分支是轻量级的。</p>
-<p>创建deputy分支使用a3 commit安全地保存在这个分支里。HEAD依然处理分离头指针状态。它还是直接指向a3 commit.</p>
-<p><img src="images/git-from-the-inside-out/11-a3-on-deputy.png" alt="11-a3-on-deputy.png"></p>
-<h2 id="切换分支"><a href="#切换分支" class="headerlink" title="切换分支"></a>切换分支</h2><hr>
-<pre><code>3alpha $ git checkout master
-Previous HEAD position was 50ac643 a3
-Switched to branch &apos;master&apos;</code></pre><p>用户切换到master分支。</p>
-<p>第一，Git通过master找到a2 commit,然后找到a2 commit 指向的树形图。</p>
-<p>第二，Git将树形图存储的内容写到工作空间中，这样，data/number.txt的内容将会改为2.</p>
-<p>第三，Git根据当前工作空间的内容更新index的内容。在这里关于data/number.txt的条目将会更新的。</p>
-<p>第四，Git将HEAD指向master分支，即HEAD文件的内容从哈希值变为：</p>
-<pre><code>alpha $ cat .git/HEAD
-ref: refs/heads/master</code></pre><p>对应的树形图为：</p>
-<p><img src="images/git-from-the-inside-out/12-a3-on-master-on-a2.png" alt="12-a3-on-master-on-a2.png"></p>
-<h1 id="切换到一个与当前工作空间不兼容的分支"><a href="#切换到一个与当前工作空间不兼容的分支" class="headerlink" title="切换到一个与当前工作空间不兼容的分支"></a>切换到一个与当前工作空间不兼容的分支</h1><hr>
-<pre><code>alpha $ printf &apos;789&apos; &gt; data/number.txt
-alpha $ git checkout deputy
-error: Your local changes to the following files would be overwritten by checkout:
-        data/number.txt
-Please commit your changes or stash them before you switch branches.
-Aborting</code></pre><p>假设用户意外将data/number.txt的内容修改为789.然后他尝试切换到分支deputy。但Git阻止了这个动作。</p>
-<p>HEAD当前指向master，master指定a2 commit ，这时工作目录下data/number.txt的内容是2.deputy指向a3 commit，相应的data/number.txt的内容是3. 工作空间下data/number.txt的内容是789. 这三个版本的内容都是不同的，必须要处理。</p>
-<p>用户在更改data/number.txt内容为789，并切换到deputy时，Git尝试将deputy分支指向的a3 commit中的data/number.txt内容写到工作空间，但是这将会导致当前工作空间下data/number.txt 的789数据丢失，所以Git阻止这一行为。</p>
-<p>Git可以将当前工作空间的内容与将要切换的分支进行合并，但是这个过程是复杂的。所以，Git阻止了这个行为。</p>
-<pre><code>alpha $ printf &apos;2&apos; &gt; data/number.txt
-alpha $ git checkout deputy
-Switched to branch &apos;deputy&apos;</code></pre><p>当用户将之前意外修改的data/number.txt 重新设置为原来的内容，他就可以成功切换分支：</p>
-<p><img src="images/git-from-the-inside-out/13-a3ondeputy.png" alt="13-a3ondeputy.png"></p>
-<h2 id="合并一个祖先分支"><a href="#合并一个祖先分支" class="headerlink" title="合并一个祖先分支"></a>合并一个祖先分支</h2><hr>
-<pre><code>alpha $ git merge master
-Already up to date.</code></pre><p>用户将master分支合并到deputy。合并两个分支实际就是合并两个commit.第一个commit就是deputy指向的：它是接收者。第二个commit就量master指向的：它是提供者。对于这个合并，Git不会做任何动作。它直接报告Already up to date。</p>
-<p>树表图属性：树形图中的一系列提交可以理解为对内容的一系列修改。这意味着，如果提供者分支是接收者分支的祖先，Git将不会做任何修改，这些修改在接收者分支中早已合并，或者说，接收者分支本身就包含这些信息，既然已经包含，再做其他动作也是无谓的。</p>
-<h2 id="合并一个后代分支"><a href="#合并一个后代分支" class="headerlink" title="合并一个后代分支"></a>合并一个后代分支</h2><hr>
-<pre><code>alpha $ git checkout master
-Switched to branch &apos;master&apos;</code></pre><p>用户先切换到master分支</p>
-<p><img src="images/git-from-the-inside-out/14-a3-on-master-on-a2.png" alt="14-a3-on-master-on-a2.png"></p>
-<pre><code>alpha $ git merge deputy
-Fast-forward</code></pre><p>用户将deputy分支合并到master分支。Git发现master这个接收者分支是deputy的祖先分支，它可以做fast-forward 合并。</p>
-<p>Git获取到deputy指向的a3 commit及它指向的树形图，Git将树形中的内容写到工作空间中，并更新index。这样Git就完成了fast-forwards。</p>
-<p><img src="images/git-from-the-inside-out/15-a3-on-master.png" alt="15-a3-on-master.png"></p>
-<p>树形图属性：树形图中的一系列提交可以理解为对内容的一系列修改。这意味着，在合并的两个分支中，如果提供者分支是接收者分支的后代，版本历史是没有改变的。例如deputy 指向的a3 commit的历史有 a2 a1. 而master指向的a2 commit的历史有a1,这些历史提交版本并没有不同之处。因此，Git直接将HEAD指向到时提供者者deputy分支上即可。</p>
-<p>以下是两种简单的合并情况，下面是复杂的合并情况</p>
-<h2 id="合并两个兄弟分支"><a href="#合并两个兄弟分支" class="headerlink" title="合并两个兄弟分支"></a>合并两个兄弟分支</h2><hr>
-<pre><code>alpha $ printf &apos;4&apos; &gt; data/number.txt
-alpha $ git add data/number.txt
-alpha $ git commit -m &apos;a4&apos;
-[master 19a5293] a4
- 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre><p>用户修改master分支下的data/number.txt，并提交修改</p>
-<pre><code>alpha $ git checkout deputy
-Switched to branch &apos;deputy&apos;
-alpha $ printf &apos;b&apos; &gt; data/letter.txt
-alpha $ git add data/letter.txt
-alpha $ git commit -m &apos;b3&apos;;
-[deputy 070b587] b3
- 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre><p>用户切换到deputy分支，并修改data/letter.txt ，并提交修改。两个分支的操作结果用树形图表示为：</p>
-<p><img src="images/git-from-the-inside-out/16-a4-b3-on-deputy.png" alt="16-a4-b3-on-deputy.png"></p>
-<p>树形图属性：不同的commit可以共有一个父commit。这意味着在提交历史中可以有两个或多个不同的后代分支。</p>
-<p>树形图属性：commit可以拥有多个父commit。这意味着两个分离的分支可以合并成一个分支。</p>
-<pre><code>alpha $ git merge master -m &apos;b4&apos;
-Merge made by the &apos;recursive&apos; strategy.
- data/number.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre><p>用户将master合并到deputy。</p>
-<p>Git发现接收者分支b3 和提供者分支 a4是两个不同世系的分支，合并这种分支需要八个步骤：</p>
-<p>第一，Git将的提供者分支的哈希值写到文件.git/MERGE_HEAD中，这个文件的存在告诉Git正处理合并中。</p>
-<p>第二，Git先找到两个分支的最后共同祖先，在这里是a3分支。</p>
-<p><img src="images/git-from-the-inside-out/17-a4-b3-on-deputy.png" alt="17-a4-b3-on-deputy.png"></p>
-<p>树形图属性：commit拥有父commit。这意味着两个不同世系的commit可以找到一个共同的祖先commit。Git通过commit对象中保存的父commit对象查找，最终，找到a3为b3和a4的共同祖先commit.</p>
-<p>第三，Git从a3 commit、b3 commit 、a4 commit指向的树形图中生成<code>index</code>。</p>
-<p>第四，Git通过对比步骤3生成的index.得出一个diff，这个diff里面的条目包含文件路径，并且标记这些文件的变化类型：增加、删除、修改、冲突。</p>
-<p>Git获取a3 、b3、a4 commit中所有文件的索引。</p>
-<p>在这里，diff中有两个条目：</p>
-<ul>
-<li>一个条目关于data/letter.txt。这个文件的内容在 a3 commit 是a, 在 deputy是b, d master中是a.因此存在不同。但是a3 commit和 a4 commit中是一致的。Git检测到文件内容被接收方分支修改，但提供方分支没有修改。因此，diff条目中关于data/letter.txt的变化类型是 修改。</li>
-<li>另一条是关于data/number.txt。这个文件的内容在接收方commit 和父commit中相同，提供方commit中不同。因此，diff条目中关于data/number.txt 的变化类型同样的修改。</li>
-</ul>
-<p>树形图属性：一般都能找到合并的父commit。这意味着，如果文件只在接收方分支或提供方分支中修改了，那么Git可以自动解决这个文件的合并问题，这样可以减少用户的工作。</p>
-<p>第五，diff条目中是显示的修改被生成到工作空间。也就是data/letter.txt的内容设置为b,data/number.txt的内容设置为4.</p>
-<p>第六，将工作目录下的变化更新的index.index中关于data/letter.txt的条目将指向包含内容为b的blob对象，关于data/number.txt的条目将指向包含内容为4的blob对象。</p>
-<p>第七，提交index中保存的内容。</p>
-<pre><code>alpha $ git cat-file -p d206
-tree 20294508aea3fb6f05fcc49adaecc2e6d60f7e7d
-parent 070b5874053a20c332b811678e8c309ba4012a8b
-parent 19a52935ef77e9a25597f1e397692208aa440bd3
-author xiejianxun &lt;xiejianxun@outlook.comm&gt; 1583763966 +0800
-committer xiejianxun &lt;xiejianxun@outlook.comm&gt; 1583763966 +0800
+![HEAD指向master，master指向commit a1](images/git-from-the-inside-out/3-a1-refs.png)
 
-b4</code></pre><p>可以看出 b4 commit有两个父commit。</p>
-<p>第八，Git将HEAD指向当前分支deputy的最新提交。</p>
-<p>所有步骤的最后结果用树形图表示为</p>
-<p><img src="images/git-from-the-inside-out/18-b4-on-deputy.png" alt="18-b4-on-deputy.png"></p>
-<h2 id="合并两个来自兄弟分支且它们修改同一文件"><a href="#合并两个来自兄弟分支且它们修改同一文件" class="headerlink" title="合并两个来自兄弟分支且它们修改同一文件"></a>合并两个来自兄弟分支且它们修改同一文件</h2><hr>
-<pre><code>alpha $ git checkout master
-alpha $ git merge deputy
-Updating 19a5293..d206abe
-Fast-forward
- data/letter.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre><p>用户切换到时master分支，并将deputy分支合并到master分支。这个动作的结果是master fast-forward到b4 commit。现在master与deputy都指向同一个commit。</p>
-<p><img src="images/git-from-the-inside-out/19-b4-master-deputy-on-b4.png" alt="19-b4-master-deputy-on-b4.png"></p>
-<pre><code>alpha $ git checkout deputy
-Switched to branch &apos;deputy&apos;
-alpha $ printf &apos;5&apos; &gt; data/number.txt
-alpha $ git add data/number.txt
-alpha $ git commit -m &apos;b5&apos;
-[deputy 5840214] b5
- 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre><p>用户切换到deputy，将data/number.txt 的内容改变为5，并提交修改。</p>
-<pre><code>alpha $ git checkout master
-Switched to branch &apos;master&apos;
-alpha $ printf &apos;6&apos; &gt; data/number.txt
-alpha $ git add data/number.txt
-alpha $ git commit -m &apos;b6&apos;
-[master 0163655] b6
- 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre><p>用户切换到master，将data/number.txt的内容改变为6，并提交修改。</p>
-<p><img src="images/git-from-the-inside-out/20-b5-on-deputy-b6-on-master.png" alt="20-b5-on-deputy-b6-on-master.png"></p>
-<pre><code>alpha $ git merge deputy
-Auto-merging data/number.txt
-CONFLICT (content): Merge conflict in data/number.txt
-Automatic merge failed; fix conflicts and then commit the result.</code></pre><p>用户想将deputy合并到git，但是出现冲突导致合并中止。合并冲突处理的前六个步骤与不冲突的合并处理一样：</p>
-<ul>
-<li>第一，生成.git/MERGE_HEAD</li>
-<li>第二，找到共同的父commit。</li>
-<li>第三，生成父commit、接收方commit和提供方commit的index。</li>
-<li>第四，根据index，创建一个diff。</li>
-<li>第五，更新的工作空间。</li>
-<li>第六，更新的index。</li>
-</ul>
-<p>由于冲突，第七和第八步不会发生。下面再次分析这些过程看看发生了什么。</p>
-<p>第一，git 将提供方commit的哈希值写到文件.git/MERGE_HEAD.</p>
-<p><img src="images/git-from-the-inside-out/21-b6-on-master-with-merge-head.png" alt="21-b6-on-master-with-merge-head.png"></p>
-<p>第二，Git找到双方的最近的父commit，这里是b4 commit.</p>
-<p>第三，Git通过父commit、提供方commit、接收方commit分别生成它们的index。</p>
-<p>第四，Git 生成一个diff，里面组合了三个commit的更改信息。这个diff里面是一些文件路径，并且标明这些文件发生的修改是：添加、删除、修改还是冲突。</p>
-<p>根据这次合并的情况，diff中只含有一个条目：data/number.txt。这个条目标识了data/number.txt合并过程中发生冲突，因为data/number.txt在三个commit中的内容都不相同，因此Git无法决定怎样合并。</p>
-<p>第五，diff显示冲突的条目被标识到工作空间中的data/number.txt中。对于冲突区域，Git将所有冲突信息写到工作空间中的data/number.txt中。下面是工作空间中的data/number.txt的内容。</p>
-<pre><code>alpha $ cat data/number.txt
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-6
-=======
-5
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; deputy</code></pre><p>第六，Git将diff中的条目更新到index中，index中的条目通过文件路径和状态唯一标识一个文件。没有冲突的的条目它的状态是用0表示。在这次合并前，index的内容大概如下：</p>
-<pre><code>alpha $ git ls-files --stage
-100644 63d8dbd40c23542e740659a7168a0ce3138ea748 0       data/le                                                                                         tter.txt
-100644 62f9457511f879886bb7728c986fe10b0ece6bcb 0       data/nu                                                                                         mber.txt</code></pre><p>当index中写入diff中的信息时，index的内容大概如下：</p>
-<pre><code>alpha $ **git ls-files --stage**
-100644 63d8dbd40c23542e740659a7168a0ce3138ea748 0       data/le                                                                                         tter.txt
-100644 bf0d87ab1b2b0ec1a11a3973d2845b42413d9767 1       data/nu                                                                                         mber.txt
-100644 62f9457511f879886bb7728c986fe10b0ece6bcb 2       data/nu                                                                                         mber.txt
-100644 7813681f5b41c028345ca62a2be376bae70b7f61 3       data/nu                                                                                         mber.txt</code></pre><p>data/letter.txt对应的条目状态为0，与将diff信息写入index前相同。data/number.txt的状态不再是0.有三个条目关于data/number.txt。状态为1的条目有父commit中data/number.txt对应的哈希值。状态为2的条目有接收方commit中data/number.txt对应的哈希值。状态为3的条目有提供方commit中data/number.txt 对应的哈希值。有这三个条目的存在说明合并存在冲突。</p>
-<p>所以合并中止了。</p>
-<pre><code>alpha $ printf &apos;11&apos; &gt; data/number.txt
-alpha $ git add data/number.txt</code></pre><p>用户对data/number.txt的冲突内容进行修改为11，然后通过git add将内容添加到index。Git生成一个包含11的blob对象。添加冲突文件到index会告诉Git冲突已经解决。Git将删除index中状态为1,2,3的条目，并添加一条状态为0，指向新生成blob对象的项目，现在index的内容如下：</p>
-<pre><code>alpha $ git add dgit ls-files --stage
-100644 63d8dbd40c23542e740659a7168a0ce3138ea748 0       data/letter.txt
-100644 9d607966b721abde8931ddd052181fae905db503 0       data/number.txt
+Git 对象都是存储在特殊的文件中(需要`git cat-file`才能查看里面的内容），`master`和`HEAD`存储在普通的文件中(直接用`cat`命令可以查看内容）
 
-alpha $ git commit -m &apos;b11&apos;
-[master 5c673b4] b11</code></pre><p>由于用户解决了冲突，git commit会完成之前没有完成的第七和第八步。</p>
-<p>第七，用户提交冲突修改，Git发现仓库中有.git/MERGE_HEAD,这个文件告诉Git合并正在处理中，然后Git检查index并发生没有冲突。Git创建一个新的commit b11.用于记录解决了冲突的合并。并且Git会删除.git/MERGE_HEAD.到这一步已经完成合并工作。</p>
-<p>第八，Git将HEAD指向当前分支master的最新的commit b11.</p>
-<h2 id="删除文件"><a href="#删除文件" class="headerlink" title="删除文件"></a>删除文件</h2><hr>
-<p>下图是树形图包含所有历史commit、最新的commit包含的tree&amp;blob对象和工作空间及idnex：</p>
-<p><img src="images/git-from-the-inside-out/23-b11-with-objects-wc-and-index.png" alt="23-b11-with-objects-wc-and-index.png"></p>
-<pre><code>alpha $ git rm data/letter.txt
-rm &apos;data/letter.txt&apos;</code></pre><p>用户告知Git删除了data/letter.txt文件。此时工作空间中的文件被删除，index中关于data/letter.txt的条目也被删除，说明Git不再追踪此文件。</p>
-<p><img src="images/git-from-the-inside-out/24-b11-letter-removed-from-wc-and-index.png" alt="24-b11-letter-removed-from-wc-and-index.png"></p>
-<pre><code>alpha $ git commit -m &apos;11&apos;
-[master 1f727e1] 11
- 1 file changed, 1 deletion(-)
- delete mode 100644 data/letter.txt</code></pre><p>用户提交了删除文件的修改。用于根据index中的内容生成一个新的树形图表示index中的内容。data/letter.txt不再包含在这个新的树形图中，因为它不在index中。</p>
-<p><img src="images/git-from-the-inside-out/25-11.png" alt="25-11.png"></p>
-<h2 id="复制一个仓库"><a href="#复制一个仓库" class="headerlink" title="复制一个仓库"></a>复制一个仓库</h2><hr>
-<pre><code>alpha $ cd ..
-git $ cp -R alpha bravo
-git $ ls
-alpha  bravo</code></pre><p>用户将文件夹alpha中的所有内容复制到bravo文件夹中。现在git的目录结构如下：</p>
-<pre><code>git $ tree
-.
-|-- alpha
-|   `-- data
-|       `-- number.txt
-`-- bravo
-    `-- data
-        `-- number.txt</code></pre><p>现在，bravo目录下同样包含一个树形图：</p>
-<p><img src="images/git-from-the-inside-out/26-11-cp-alpha-to-bravo.png" alt="26-11-cp-alpha-to-bravo.png"></p>
-<h2 id="连接两个Git仓库中"><a href="#连接两个Git仓库中" class="headerlink" title="连接两个Git仓库中"></a>连接两个Git仓库中</h2><hr>
-<pre><code>git $ cd alpha/
-alpha $ git remote add bravo ../bravo</code></pre><p>用户重新的进入alpha仓库，他将bravo设为一个远程仓库。这个操作会被记录在.git/config中。</p>
-<pre><code>alpha $ cat .git/config
-省略部分内容...
-[remote &quot;bravo&quot;]
-        url = ../bravo
-        fetch = +refs/heads/*:refs/remotes/bravo/*</code></pre><p>上面的内容表示有一个远程仓库叫 bravo，它的本地文件系统中，地址是../bravo.</p>
-<h2 id="从远程仓库中取出一个分支"><a href="#从远程仓库中取出一个分支" class="headerlink" title="从远程仓库中取出一个分支"></a>从远程仓库中取出一个分支</h2><hr>
-<pre><code>alpha $ cd ../bravo
-bravo $ printf &apos;12&apos; &gt; data/number.txt
-bravo $ git add data/number.txt
-bravo $ git commit -m &apos;12&apos;
-[master f8f1d2c] 12
-1 file changed, 1 insertion(+), 1 deletion(-)</code></pre><p>用户在bravo仓库中将data/number.txt的内容修改为12并提交本次修改。结果如下：</p>
-<p><img src="images/git-from-the-inside-out/27-12-bravo.png" alt="27-12-bravo.png"></p>
-<pre><code>bravo $ cd ../alpha/
-alpha $ git fetch bravo master
-remote: Enumerating objects: 7, done.
-remote: Counting objects: 100% (7/7), done.
-remote: Total 4 (delta 0), reused 0 (delta 0)
-Unpacking objects: 100% (4/4), done.
-From ../bravo
- * branch            master     -&gt; FETCH_HEAD
- * [new branch]      master     -&gt; bravo/master</code></pre><p>用户重新的回到alpha仓库，并从bravo中获取master分支到alpha中。这个过程分为四步：</p>
-<p>第一，git 获取bravo中master分支指向的commit的哈希值。在这里是 commit 12对应的哈希值。</p>
-<p>第二，Git列出bravo仓库中commit 12依赖的所有对象：commit 对象， tree对象、blob对象、所有祖先commit对象及它们对应的树形图包含的对象。然后Git删除alpha仓库中已经包含的对象。最后将剩余不同复制到aplha/.git/objects</p>
-<p>第三，记录commit 12 的哈希值。<code>alpha/.git/refs/remotes/bravo/master</code>的内容设置为指向commit 12的哈希值。</p>
-<p>第四，alpha/.git/FETCH_HEAD的内容设置为</p>
-<pre><code>f8f1d2c62a3666b80910e2182867a45d9040b48e                branch &apos;master&apos; of ../bravo</code></pre><p>这表明最新的的fetch命令从bravo中获取了master分支的f8f1指向的commit 对象。</p>
-<p><img src="images/git-from-the-inside-out/28-12-fetched-to-alpha.png" alt="28-12-fetched-to-alpha.png"></p>
-<p>树形图属性：对象是可以复制的。这意味着整个仓库的历史可以在不同的仓库中共享。</p>
-<p>树形图属性：一个仓库可以存储规程仓库的分支引用如alpha/.git/refs/remotes/bravo/master.这意味仓库中可以将本地状态存储在远程仓库中。如果远程仓库更新的了，那么本地获取的分支将会过时。</p>
-<h2 id="合并FETCH-HEAD"><a href="#合并FETCH-HEAD" class="headerlink" title="合并FETCH_HEAD"></a>合并FETCH_HEAD</h2><hr>
-<pre><code>alpha $ git merge FETCH_HEAD
-Updating 1f727e1..f8f1d2c
-Fast-forward
- data/number.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre><p>用户将FETCH_HEAD指向的分支合并到master分支中。注意FETCH_HEAD也只不过是一个引用而已。这个过程与先前的合并本地分支没有什么不同，在这里，Git做了一个fast-forward合并，将master指向了commit 12. 合并后的树形图表示如下：</p>
-<p><img src="images/git-from-the-inside-out/29-12-merged-to-alpha.png" alt="29-12-merged-to-alpha.png"></p>
-<h3 id="从-远程仓库中拉取一个分支"><a href="#从-远程仓库中拉取一个分支" class="headerlink" title="从 远程仓库中拉取一个分支"></a>从 远程仓库中拉取一个分支</h3><hr>
-<pre><code>alpha $ git pull bravo master
-From ../bravo
- * branch            master     -&gt; FETCH_HEAD
-Already up to date.</code></pre><p>用户将alpha中的master分支推送到时远程仓库bravo中。pull</p>
-<p>其实就是 fetch 和merge FETCH_HEAD的合并操作。Git完成这两个命令后，并报告master is Already up to date.</p>
-<h2 id="复制一个仓库-1"><a href="#复制一个仓库-1" class="headerlink" title="复制一个仓库"></a>复制一个仓库</h2><hr>
-<pre><code>alpha $ cd ..
-git $ git clone alpha charlie
-Cloning into &apos;charlie&apos;...
-done.
-git $ ls
-alpha  bravo  charlie</code></pre><p>用户在移动到git目录下。他克隆alpha仓库存储在charlie。克隆的charlie仓库与之前cp命令生成的bravo仓库类似。Git创建一个新的目录charlie，将charlie初始化为一个Git仓库。将alpha作为一个远程仓库。将alpha这个远程仓库命名为origin.使用fetch origin并merge FETCH_HEAD.</p>
-<pre><code>git $ cat charlie/.git/config
-[core]
-        repositoryformatversion = 0
-        filemode = true
-        bare = false
-        logallrefupdates = true
-[remote &quot;origin&quot;]
-        url = /root/git/alpha
-        fetch = +refs/heads/*:refs/remotes/origin/*
-[branch &quot;master&quot;]
-        remote = origin
-        merge = refs/heads/master</code></pre><h2 id="推送分支到远程仓库中一个被签出的分支中"><a href="#推送分支到远程仓库中一个被签出的分支中" class="headerlink" title="推送分支到远程仓库中一个被签出的分支中"></a>推送分支到远程仓库中一个被签出的分支中</h2><hr>
-<pre><code>git $ cd alpha/
-alpha $ printf &apos;13&apos; &gt; data/number.txt
-alpha $ git add data/number.txt
-alpha $ git commit -m &apos;13&apos;
-[master b92ab33] 13
- 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre><p>用户进入alpha仓库，修改data/number.txt文件的内容为13.并提交这次修改为commit 13.</p>
-<pre><code>alpha $ git remote add charlie ../charlie</code></pre><p>将charlie设置为alpha的一个远程仓库</p>
-<pre><code>alpha $ git push charlie master
-Enumerating objects: 7, done.
-Counting objects: 100% (7/7), done.
-Writing objects: 100% (4/4), 277 bytes | 277.00 KiB/s, done.
-Total 4 (delta 0), reused 0 (delta 0)
-remote: error: refusing to update checked out branch: refs/heads/master
-remote: error: By default, updating the current branch in a non-bare repository
-remote: is denied, because it will make the index and work tree inconsistent
-remote: with what you pushed, and will require &apos;git reset --hard&apos; to match
-remote: the work tree to HEAD.
-remote:
-remote: You can set the &apos;receive.denyCurrentBranch&apos; configuration variable
-remote: to &apos;ignore&apos; or &apos;warn&apos; in the remote repository to allow pushing into
-remote: its current branch; however, this is not recommended unless you
-remote: arranged to update its work tree to match what you pushed in some
-remote: other way.
-remote:
-remote: To squelch this message and still keep the default behaviour, set
-remote: &apos;receive.denyCurrentBranch&apos; configuration variable to &apos;refuse&apos;.
-To ../charlie
- ! [remote rejected] master -&gt; master (branch is currently checked out)
-error: failed to push some refs to &apos;../charlie&apos;</code></pre><p>用户将alpha的master分支推送到charlie中</p>
-<p>commit 13所关联的所有对象都被复制到charlie仓库中。</p>
-<p>这时，推送操作失败。Git向用户说明了失败的原因。远程仓库中的分支被checkout到工作空间中，alpha的Push操作会更新远程仓库的index和HEAD。如果有人远程仓库的工作空间中编辑，push操作将会导致混乱。所以Git阻止推送操作。</p>
-<p>但是，用户想建一个仓库中，用户可以随时推送到这个仓库中，下面将建立这个一个仓库：</p>
-<h2 id="克隆一个bare仓库"><a href="#克隆一个bare仓库" class="headerlink" title="克隆一个bare仓库"></a>克隆一个bare仓库</h2><hr>
-<pre><code>alpha $ cd ..
-git $ git clone alpha delta --bare
-Cloning into bare repository &apos;delta&apos;...
-done.</code></pre><p>用户克隆一个空的仓库。这个克隆操作与之后的克隆有所不同。config文件表示这个仓库是bare的。</p>
-<pre><code>delta $ cat config
-[core]
-        repositoryformatversion = 0
-        filemode = true
-        **bare = true**
-[remote &quot;origin&quot;]
-        url = /root/git/alpha</code></pre><p>所有原本存储在.git中的文件现在都存储在根目录中。并且没有了原本工作空间中的文件。</p>
-<pre><code># bare repo
-delta $ ls
-branches  config  description  HEAD  hooks  info  objects  packed-refs  refs
+注意：`HEAD`指向`master`在commit之前已经完成。`master`现在指定了最新的commit对象。
 
-# ordinary repo
-delta $ ls ../alpha/  ../alpha/.git -ah
-../alpha/:
-.  ..  data  .git
+以上是第一次提交的情况。
+---
+---
+## 非第一次提交的提交
+---
 
-**../alpha/.git:**
-.   branches        config       FETCH_HEAD  hooks  info  objects    refs
-..  COMMIT_EDITMSG  description  HEAD        index  logs  ORIG_HEAD</code></pre><p><img src="images/git-from-the-inside-out/30-13-alpha-cloned-to-delta-bare.png" alt="30-13-alpha-cloned-to-delta-bare.png"></p>
-<h3 id="推送一个分支到bare仓库中"><a href="#推送一个分支到bare仓库中" class="headerlink" title="推送一个分支到bare仓库中"></a>推送一个分支到bare仓库中</h3><hr>
-<pre><code>delta $ cd ../alpha/
-alpha $ git remote add delta ../delta
-alpha $ printf &apos;14&apos; &gt; data/number.txt
-alpha $ git commit -am&apos;14&apos;
-[master f001318] 14
- 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre><p>用户进入alpha仓库，将delta设置远程仓库，修改data/number.txt中的内容为14，并提交这次操作。</p>
-<p><img src="images/git-from-the-inside-out/31-14-alpha.png" alt="31-14-alpha.png"></p>
-<pre><code>alpha $ git push delta master
-Enumerating objects: 7, done.
-Counting objects: 100% (7/7), done.
-Writing objects: 100% (4/4), 276 bytes | 276.00 KiB/s, done.
-Total 4 (delta 0), reused 0 (delta 0)
-To ../delta
-   b92ab33..f001318  master -&gt; master</code></pre><p>用户将alpha的master分支推送到delta。这个push操作分为三步：</p>
-<p>第一，alpha的master分支中的commit 14所需要的所有对象将会从alpha/.git/objects复制到delta/objects中。</p>
-<p>第二，delta/refs/heads/master更新的commit 14</p>
-<pre><code>delta $ cat HEAD
-ref: refs/heads/master
-delta $ cat refs/heads/master
-f0013185d0a45ecf7f7be00692ddfa6359954513
+![commit a1与工作空间和index之间的关系](images/git-from-the-inside-out/4-a1-wc-and-index.png)
 
-delta $ cd ../alpha
-alpha $ cat .git/HEAD
-ref: refs/heads/master
-alpha $ cat .git/refs/heads/master
-f0013185d0a45ecf7f7be00692ddfa6359954513</code></pre><p>第三，alpha/.git/refs/remotes/delta/master更新为指向commit 14.这时，alpha将自己的最新状态同步到delta中。</p>
-<p><img src="images/git-from-the-inside-out/32-14-pushed-to-delta.png" alt="32-14-pushed-to-delta.png"></p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
-<p>Git 建立在这个抽象的树形图中。几乎所有的Git命令都会操作这个树形图。要想深入理解Git，重点关注这个树形图的属性，而不是死记命令。</p>
-<p>为了深入学习Git，探索.git目录中的内容是不可避免。</p>
-<p>没有涉及到的命令：</p>
-<p>git prune →用于删除一个引用无法关联到的所有对象，如果用户运行这个命令，会导致内容的丢失。</p>
-<p>git stash → 将工作空间中与HEAD指向的提交之间的diff存储在一个安全的地方，它们可以在后面被检索出来。用于临时保存内容。</p>
-<p>git rebase → 这个命今用于添加、编辑和删除objects中存储的commit。</p>
+上面是一个包含工作空间和`index`(暂存区的树形图）
 
+现在workspace、index和commit a1中的`data/letter.txt`和`data/number.txt`都含有相同的内容分别为`a`和`1`. `index`和`HEAD`都使用哈希值指定它们引用的blob对象，但是工作空间中的内容是用文本存储在不同的地方(即不是.git/objects中）。
+
+执行以下的命令后，
+
+    alpha $ printf &apos;2&apos; &gt; data/number.txt
+    alpha $ git add data/number.txt
+
+树形图会发生变化:首先工作空间中的data/number.txt文件发生变化，内容从1变成2. idnex不会变化。
+
+![5-a1-wc-number-set-to-2.png](images/git-from-the-inside-out/5-a1-wc-number-set-to-2.png)
+
+执行`git add`后，index变化。它会在`.git/objects`下创建一个blob对象，这个对象存储着2.然后，`index`中的关于`data/number.txt`的条目的哈希值更改为这个新生成的blob对象的哈希值。
+
+![6-a1-wc-and-index-number-set-to-2.png](images/git-from-the-inside-out/6-a1-wc-and-index-number-set-to-2.png)
+
+    alpha $ git commit -m &apos;a2&apos;
+    [master 8734e79] a2
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+用户再次执行commit后，产生的影响与之后的commit一样.
+
+首先，创建一个新的树形图表示index中的内容。
+
+index中的关于data/number.txt的条目发生了变化。代表data目录的旧tree对象将不能表示现在index中表示的状态。所有需要生成一个新的tree 对象。
+
+    alpha $ git cat-file -p 40b0
+    100644 blob 2e65efe2a145dda7ee51d1741299f848e5bf752e    letter.txt
+    100644 blob d8263ee9860594d2806b0dfd1bfd17528b0ba2a4    number.txt # 与之前的不同
+
+新的表示`data`的tree对象的哈希值与旧的不同。因此新的`root` tree对象也需要生成
+
+    alpha $ git cat-file -p ce72
+    040000 tree 40b0318811470aaacc577485777d7a6780e51f0b    data
+
+然后，生成一个新的commit对象：
+
+    alpha $ git cat-file -p 8734
+    tree ce72afb5ff229a39f6cce47b00d1b0ed60fe3556
+    parent a89ea183a48e484c318335fd25c8adcc82608c35
+    author xiejianxun &lt;xiejianxun@outlook.comm&gt; 1583753450 +0800
+    committer xiejianxun &lt;xiejianxun@outlook.comm&gt; 1583753450 +0800
+
+    a2
+
+第一行指向了新的root tree对象。第二行指向了a1 commit对象。它是a2 commit对象的父亲。为了在生成新的 a2 commit对象，Git需要先找到父commit对象：Git首先找到HEAD，通过HEAD定位到master，然后通过master找到a1 commit对象。
+
+最后，master文件中的内容修改为指定新的commit对象。
+
+![7-a2.png](images/git-from-the-inside-out/7-a2.png)
+
+从上图可以看出，在a2 commit时，data/letter.txt会利用a1 commit中的blob对象，这样可以减少空间占用。
+
+**树形图属性：**项目的内容存储在对象树中。这意味着Git只会存储修改的文件。如果目录下所有文件都没有修改，则会复用整个tree 对象。通常情况下，每次的提供通常只会修改少量内容，所以即使提交了大量commit，空间不会占用太多。
+
+**树形图属性：**每个commit都有一个父commit(当然，第一个commit没有)。这意味着仓库可以存储项目的整个历史。
+
+**树形图属性：**引用是历史提交版本的入口。这意味着每次提交都可以指定一个人意义的名称。Git使用如`HEAD`、`MEGRE_HEAD`、`FETCH_HEAD`
+
+之类的引用来支持操作提交历史的命令。
+
+树形图属性：`.git/objects`下的所有文件是不可修改的。这意味着内容只会被修改，不会被删除。也就是说每次添加和commit的内容都会储存在objects目录下。
+
+树形图属性：引用是可以修改的。比如master当前可能指向目前项目中最好的提交版本，但是，很快就会有更好的提交版本，所以master又会指向这个新提交的版本。
+
+树形图属性：工作空间和引用指向的提交是随时准备好被读取的，但是其他提交版本不是，以上图为例，a2 commit的内容可以通过ckeckout 立即读取到，而a1则不能，还需要查看。
+
+在没有git add之前，Git不会保存用户做的任何修改。
+
+HEAD是最容易变化的引用。
+
+如果一个提交没有被任何引用记录，将会很难切换到这个提交的版本。
+
+## 切换到一个提交
+
+    alpha $ git reflog
+    8734e79 (HEAD -&gt; master) HEAD@{0}: commit: a2
+    a89ea18 HEAD@{1}: commit (initial): a1
+    alpha $ **git checkout 8734**
+    Note: switching to &apos;8734&apos;.
+
+    You are in &apos;detached HEAD&apos; state.
+
+用户通过哈希值切换到a2 commit.(通过git log或reflog可以找到提交的哈希值。
+
+Checkout命令分为四个步骤：
+
+第一，Git找到在.git/objects通过ckeckOut命令中的哈希值找到对应的commit对象(a2 commit 对象)和它指向的树形图。
+
+第二，Git将树形图中的tree对象和blob对象变成工作空间中相应的目录和文件。由于HEAD通过master已经指向了a2 commit，所有工作空间中的文件不会有变化。
+
+第三，Git将更新index中的条目，由于文件没有变化所以index中的内容也没有变化。
+
+第四，HEAD文件中的内容将会设置会a2 commit的哈希值。
+
+    alpha $ cat .git/HEAD
+    8734e794c8a443c0dc3e04cc91a2f835c77b2c9d
+    alpha $ git status
+    HEAD detached at 8734e79
+    nothing to commit, working tree clean
+
+将HEAD的内容设置为一个哈希值将会使Git仓库进入分离头指针状态( detached HEAD state).
+
+从下图可以看出，`HEAD`直接指向了`a2` commit,而不是master。
+
+![9-a2-detached-head.png](images/git-from-the-inside-out/9-a2-detached-head.png)
+
+    alpha $ printf &apos;3&apos; &gt; data/number.txt
+    alpha $ git add data/number.txt
+    alpha $ git commit -m &apos;a3&apos;
+    [detached HEAD 50ac643] a3
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+用户将data/number.txt中的内容改变成3，并提交这次更改。Git通过HEAD找到这次提交的父commit。这次查找父commit不会再通过分支引用查找，因为HEAD中直接存储的就是commit对象的哈希值。它返回的是a2 commit对象的哈希值。
+
+Git更新的HEAD的值，HEAD同样直接指向了a3 commit。仓库依然处于detached HEAD 状态。a3 commit 不在任何分支中，这样一旦HEAD从新指向a2, a3 commit就会很容易丢失，因为没有任何其他引用指向这次引用。
+
+这次提交的示意图如下(省略了a3 commit的tree &amp; blob对象）：
+
+![10-a3-detached-head.png](images/git-from-the-inside-out/10-a3-detached-head.png)
+
+## 创建一个分支
+
+    alpha $ git branch deputy
+
+用户创建了一个新分支：deputy。这条命令会创建一个新的文件.git/refs/heads/deputy，deputy文件中存储着HEAD的指向的commit对象的哈希值。在这是就是a3 commit的哈希值。
+
+树形图属性：分支就是引用，而引用就是文件，文件中存储着commit的哈希值。这意味着Git的分支是轻量级的。
+
+创建deputy分支使用a3 commit安全地保存在这个分支里。HEAD依然处理分离头指针状态。它还是直接指向a3 commit.
+
+![11-a3-on-deputy.png](images/git-from-the-inside-out/11-a3-on-deputy.png)
+
+## 切换分支
+
+---
+
+    3alpha $ git checkout master
+    Previous HEAD position was 50ac643 a3
+    Switched to branch &apos;master&apos;
+
+用户切换到master分支。
+
+第一，Git通过master找到a2 commit,然后找到a2 commit 指向的树形图。
+
+第二，Git将树形图存储的内容写到工作空间中，这样，data/number.txt的内容将会改为2.
+
+第三，Git根据当前工作空间的内容更新index的内容。在这里关于data/number.txt的条目将会更新的。
+
+第四，Git将HEAD指向master分支，即HEAD文件的内容从哈希值变为：
+
+    alpha $ cat .git/HEAD
+    ref: refs/heads/master
+
+对应的树形图为：
+
+![12-a3-on-master-on-a2.png](images/git-from-the-inside-out/12-a3-on-master-on-a2.png)
+
+# 切换到一个与当前工作空间不兼容的分支
+
+---
+
+    alpha $ printf &apos;789&apos; &gt; data/number.txt
+    alpha $ git checkout deputy
+    error: Your local changes to the following files would be overwritten by checkout:
+            data/number.txt
+    Please commit your changes or stash them before you switch branches.
+    Aborting
+
+假设用户意外将data/number.txt的内容修改为789.然后他尝试切换到分支deputy。但Git阻止了这个动作。
+
+HEAD当前指向master，master指定a2 commit ，这时工作目录下data/number.txt的内容是2.deputy指向a3 commit，相应的data/number.txt的内容是3. 工作空间下data/number.txt的内容是789. 这三个版本的内容都是不同的，必须要处理。
+
+用户在更改data/number.txt内容为789，并切换到deputy时，Git尝试将deputy分支指向的a3 commit中的data/number.txt内容写到工作空间，但是这将会导致当前工作空间下data/number.txt 的789数据丢失，所以Git阻止这一行为。
+
+Git可以将当前工作空间的内容与将要切换的分支进行合并，但是这个过程是复杂的。所以，Git阻止了这个行为。
+
+    alpha $ printf &apos;2&apos; &gt; data/number.txt
+    alpha $ git checkout deputy
+    Switched to branch &apos;deputy&apos;
+
+当用户将之前意外修改的data/number.txt 重新设置为原来的内容，他就可以成功切换分支：
+
+![13-a3ondeputy.png](images/git-from-the-inside-out/13-a3ondeputy.png)
+
+## 合并一个祖先分支
+
+---
+
+    alpha $ git merge master
+    Already up to date.
+
+用户将master分支合并到deputy。合并两个分支实际就是合并两个commit.第一个commit就是deputy指向的：它是接收者。第二个commit就量master指向的：它是提供者。对于这个合并，Git不会做任何动作。它直接报告Already up to date。
+
+树表图属性：树形图中的一系列提交可以理解为对内容的一系列修改。这意味着，如果提供者分支是接收者分支的祖先，Git将不会做任何修改，这些修改在接收者分支中早已合并，或者说，接收者分支本身就包含这些信息，既然已经包含，再做其他动作也是无谓的。
+
+## 合并一个后代分支
+
+---
+
+    alpha $ git checkout master
+    Switched to branch &apos;master&apos;
+
+用户先切换到master分支
+
+![14-a3-on-master-on-a2.png](images/git-from-the-inside-out/14-a3-on-master-on-a2.png)
+
+    alpha $ git merge deputy
+    Fast-forward
+
+用户将deputy分支合并到master分支。Git发现master这个接收者分支是deputy的祖先分支，它可以做fast-forward 合并。
+
+Git获取到deputy指向的a3 commit及它指向的树形图，Git将树形中的内容写到工作空间中，并更新index。这样Git就完成了fast-forwards。
+
+![15-a3-on-master.png](images/git-from-the-inside-out/15-a3-on-master.png)
+
+树形图属性：树形图中的一系列提交可以理解为对内容的一系列修改。这意味着，在合并的两个分支中，如果提供者分支是接收者分支的后代，版本历史是没有改变的。例如deputy 指向的a3 commit的历史有 a2 a1. 而master指向的a2 commit的历史有a1,这些历史提交版本并没有不同之处。因此，Git直接将HEAD指向到时提供者者deputy分支上即可。
+
+以下是两种简单的合并情况，下面是复杂的合并情况
+
+## 合并两个兄弟分支
+
+---
+
+    alpha $ printf &apos;4&apos; &gt; data/number.txt
+    alpha $ git add data/number.txt
+    alpha $ git commit -m &apos;a4&apos;
+    [master 19a5293] a4
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+用户修改master分支下的data/number.txt，并提交修改
+
+    alpha $ git checkout deputy
+    Switched to branch &apos;deputy&apos;
+    alpha $ printf &apos;b&apos; &gt; data/letter.txt
+    alpha $ git add data/letter.txt
+    alpha $ git commit -m &apos;b3&apos;;
+    [deputy 070b587] b3
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+用户切换到deputy分支，并修改data/letter.txt ，并提交修改。两个分支的操作结果用树形图表示为：
+
+![16-a4-b3-on-deputy.png](images/git-from-the-inside-out/16-a4-b3-on-deputy.png)
+
+树形图属性：不同的commit可以共有一个父commit。这意味着在提交历史中可以有两个或多个不同的后代分支。
+
+树形图属性：commit可以拥有多个父commit。这意味着两个分离的分支可以合并成一个分支。
+
+    alpha $ git merge master -m &apos;b4&apos;
+    Merge made by the &apos;recursive&apos; strategy.
+     data/number.txt | 2 +-
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+用户将master合并到deputy。
+
+Git发现接收者分支b3 和提供者分支 a4是两个不同世系的分支，合并这种分支需要八个步骤：
+
+第一，Git将的提供者分支的哈希值写到文件.git/MERGE_HEAD中，这个文件的存在告诉Git正处理合并中。
+
+第二，Git先找到两个分支的最后共同祖先，在这里是a3分支。
+
+![17-a4-b3-on-deputy.png](images/git-from-the-inside-out/17-a4-b3-on-deputy.png)
+
+树形图属性：commit拥有父commit。这意味着两个不同世系的commit可以找到一个共同的祖先commit。Git通过commit对象中保存的父commit对象查找，最终，找到a3为b3和a4的共同祖先commit.
+
+第三，Git从a3 commit、b3 commit 、a4 commit指向的树形图中生成`index`。
+
+第四，Git通过对比步骤3生成的index.得出一个diff，这个diff里面的条目包含文件路径，并且标记这些文件的变化类型：增加、删除、修改、冲突。
+
+Git获取a3 、b3、a4 commit中所有文件的索引。
+
+在这里，diff中有两个条目：
+
+- 一个条目关于data/letter.txt。这个文件的内容在 a3 commit 是a, 在 deputy是b, d master中是a.因此存在不同。但是a3 commit和 a4 commit中是一致的。Git检测到文件内容被接收方分支修改，但提供方分支没有修改。因此，diff条目中关于data/letter.txt的变化类型是 修改。
+- 另一条是关于data/number.txt。这个文件的内容在接收方commit 和父commit中相同，提供方commit中不同。因此，diff条目中关于data/number.txt 的变化类型同样的修改。
+
+树形图属性：一般都能找到合并的父commit。这意味着，如果文件只在接收方分支或提供方分支中修改了，那么Git可以自动解决这个文件的合并问题，这样可以减少用户的工作。
+
+第五，diff条目中是显示的修改被生成到工作空间。也就是data/letter.txt的内容设置为b,data/number.txt的内容设置为4.
+
+第六，将工作目录下的变化更新的index.index中关于data/letter.txt的条目将指向包含内容为b的blob对象，关于data/number.txt的条目将指向包含内容为4的blob对象。
+
+第七，提交index中保存的内容。
+
+    alpha $ git cat-file -p d206
+    tree 20294508aea3fb6f05fcc49adaecc2e6d60f7e7d
+    parent 070b5874053a20c332b811678e8c309ba4012a8b
+    parent 19a52935ef77e9a25597f1e397692208aa440bd3
+    author xiejianxun &lt;xiejianxun@outlook.comm&gt; 1583763966 +0800
+    committer xiejianxun &lt;xiejianxun@outlook.comm&gt; 1583763966 +0800
+
+    b4
+
+可以看出 b4 commit有两个父commit。
+
+第八，Git将HEAD指向当前分支deputy的最新提交。
+
+所有步骤的最后结果用树形图表示为
+
+![18-b4-on-deputy.png](images/git-from-the-inside-out/18-b4-on-deputy.png)
+
+## 合并两个来自兄弟分支且它们修改同一文件
+
+---
+
+    alpha $ git checkout master
+    alpha $ git merge deputy
+    Updating 19a5293..d206abe
+    Fast-forward
+     data/letter.txt | 2 +-
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+用户切换到时master分支，并将deputy分支合并到master分支。这个动作的结果是master fast-forward到b4 commit。现在master与deputy都指向同一个commit。
+
+![19-b4-master-deputy-on-b4.png](images/git-from-the-inside-out/19-b4-master-deputy-on-b4.png)
+
+    alpha $ git checkout deputy
+    Switched to branch &apos;deputy&apos;
+    alpha $ printf &apos;5&apos; &gt; data/number.txt
+    alpha $ git add data/number.txt
+    alpha $ git commit -m &apos;b5&apos;
+    [deputy 5840214] b5
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+用户切换到deputy，将data/number.txt 的内容改变为5，并提交修改。
+
+    alpha $ git checkout master
+    Switched to branch &apos;master&apos;
+    alpha $ printf &apos;6&apos; &gt; data/number.txt
+    alpha $ git add data/number.txt
+    alpha $ git commit -m &apos;b6&apos;
+    [master 0163655] b6
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+用户切换到master，将data/number.txt的内容改变为6，并提交修改。
+
+![20-b5-on-deputy-b6-on-master.png](images/git-from-the-inside-out/20-b5-on-deputy-b6-on-master.png)
+
+    alpha $ git merge deputy
+    Auto-merging data/number.txt
+    CONFLICT (content): Merge conflict in data/number.txt
+    Automatic merge failed; fix conflicts and then commit the result.
+
+用户想将deputy合并到git，但是出现冲突导致合并中止。合并冲突处理的前六个步骤与不冲突的合并处理一样：
+
+- 第一，生成.git/MERGE_HEAD
+- 第二，找到共同的父commit。
+- 第三，生成父commit、接收方commit和提供方commit的index。
+- 第四，根据index，创建一个diff。
+- 第五，更新的工作空间。
+- 第六，更新的index。
+
+由于冲突，第七和第八步不会发生。下面再次分析这些过程看看发生了什么。
+
+第一，git 将提供方commit的哈希值写到文件.git/MERGE_HEAD.
+
+![21-b6-on-master-with-merge-head.png](images/git-from-the-inside-out/21-b6-on-master-with-merge-head.png)
+
+第二，Git找到双方的最近的父commit，这里是b4 commit.
+
+第三，Git通过父commit、提供方commit、接收方commit分别生成它们的index。
+
+第四，Git 生成一个diff，里面组合了三个commit的更改信息。这个diff里面是一些文件路径，并且标明这些文件发生的修改是：添加、删除、修改还是冲突。
+
+根据这次合并的情况，diff中只含有一个条目：data/number.txt。这个条目标识了data/number.txt合并过程中发生冲突，因为data/number.txt在三个commit中的内容都不相同，因此Git无法决定怎样合并。
+
+第五，diff显示冲突的条目被标识到工作空间中的data/number.txt中。对于冲突区域，Git将所有冲突信息写到工作空间中的data/number.txt中。下面是工作空间中的data/number.txt的内容。
+
+    alpha $ cat data/number.txt
+    &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+    6
+    =======
+    5
+    &gt;&gt;&gt;&gt;&gt;&gt;&gt; deputy
+
+第六，Git将diff中的条目更新到index中，index中的条目通过文件路径和状态唯一标识一个文件。没有冲突的的条目它的状态是用0表示。在这次合并前，index的内容大概如下：
+
+    alpha $ git ls-files --stage
+    100644 63d8dbd40c23542e740659a7168a0ce3138ea748 0       data/le                                                                                         tter.txt
+    100644 62f9457511f879886bb7728c986fe10b0ece6bcb 0       data/nu                                                                                         mber.txt
+
+当index中写入diff中的信息时，index的内容大概如下：
+
+    alpha $ **git ls-files --stage**
+    100644 63d8dbd40c23542e740659a7168a0ce3138ea748 0       data/le                                                                                         tter.txt
+    100644 bf0d87ab1b2b0ec1a11a3973d2845b42413d9767 1       data/nu                                                                                         mber.txt
+    100644 62f9457511f879886bb7728c986fe10b0ece6bcb 2       data/nu                                                                                         mber.txt
+    100644 7813681f5b41c028345ca62a2be376bae70b7f61 3       data/nu                                                                                         mber.txt
+
+data/letter.txt对应的条目状态为0，与将diff信息写入index前相同。data/number.txt的状态不再是0.有三个条目关于data/number.txt。状态为1的条目有父commit中data/number.txt对应的哈希值。状态为2的条目有接收方commit中data/number.txt对应的哈希值。状态为3的条目有提供方commit中data/number.txt 对应的哈希值。有这三个条目的存在说明合并存在冲突。
+
+所以合并中止了。
+
+    alpha $ printf &apos;11&apos; &gt; data/number.txt
+    alpha $ git add data/number.txt
+
+用户对data/number.txt的冲突内容进行修改为11，然后通过git add将内容添加到index。Git生成一个包含11的blob对象。添加冲突文件到index会告诉Git冲突已经解决。Git将删除index中状态为1,2,3的条目，并添加一条状态为0，指向新生成blob对象的项目，现在index的内容如下：
+
+    alpha $ git add dgit ls-files --stage
+    100644 63d8dbd40c23542e740659a7168a0ce3138ea748 0       data/letter.txt
+    100644 9d607966b721abde8931ddd052181fae905db503 0       data/number.txt
+
+    alpha $ git commit -m &apos;b11&apos;
+    [master 5c673b4] b11
+
+由于用户解决了冲突，git commit会完成之前没有完成的第七和第八步。
+
+第七，用户提交冲突修改，Git发现仓库中有.git/MERGE_HEAD,这个文件告诉Git合并正在处理中，然后Git检查index并发生没有冲突。Git创建一个新的commit b11.用于记录解决了冲突的合并。并且Git会删除.git/MERGE_HEAD.到这一步已经完成合并工作。
+
+第八，Git将HEAD指向当前分支master的最新的commit b11.
+
+## 删除文件
+
+---
+
+下图是树形图包含所有历史commit、最新的commit包含的tree&amp;blob对象和工作空间及idnex：
+
+![23-b11-with-objects-wc-and-index.png](images/git-from-the-inside-out/23-b11-with-objects-wc-and-index.png)
+
+    alpha $ git rm data/letter.txt
+    rm &apos;data/letter.txt&apos;
+
+用户告知Git删除了data/letter.txt文件。此时工作空间中的文件被删除，index中关于data/letter.txt的条目也被删除，说明Git不再追踪此文件。
+
+![24-b11-letter-removed-from-wc-and-index.png](images/git-from-the-inside-out/24-b11-letter-removed-from-wc-and-index.png)
+
+    alpha $ git commit -m &apos;11&apos;
+    [master 1f727e1] 11
+     1 file changed, 1 deletion(-)
+     delete mode 100644 data/letter.txt
+
+用户提交了删除文件的修改。用于根据index中的内容生成一个新的树形图表示index中的内容。data/letter.txt不再包含在这个新的树形图中，因为它不在index中。
+
+![25-11.png](images/git-from-the-inside-out/25-11.png)
+
+## 复制一个仓库
+
+---
+
+    alpha $ cd ..
+    git $ cp -R alpha bravo
+    git $ ls
+    alpha  bravo
+
+用户将文件夹alpha中的所有内容复制到bravo文件夹中。现在git的目录结构如下：
+
+    git $ tree
+    .
+    |-- alpha
+    |   `-- data
+    |       `-- number.txt
+    `-- bravo
+        `-- data
+            `-- number.txt
+
+现在，bravo目录下同样包含一个树形图：
+
+![26-11-cp-alpha-to-bravo.png](images/git-from-the-inside-out/26-11-cp-alpha-to-bravo.png)
+
+## 连接两个Git仓库中
+
+---
+
+    git $ cd alpha/
+    alpha $ git remote add bravo ../bravo
+
+用户重新的进入alpha仓库，他将bravo设为一个远程仓库。这个操作会被记录在.git/config中。
+
+    alpha $ cat .git/config
+    省略部分内容...
+    [remote &quot;bravo&quot;]
+            url = ../bravo
+            fetch = +refs/heads/*:refs/remotes/bravo/*
+
+上面的内容表示有一个远程仓库叫 bravo，它的本地文件系统中，地址是../bravo.
+
+## 从远程仓库中取出一个分支
+
+---
+
+    alpha $ cd ../bravo
+    bravo $ printf &apos;12&apos; &gt; data/number.txt
+    bravo $ git add data/number.txt
+    bravo $ git commit -m &apos;12&apos;
+    [master f8f1d2c] 12
+    1 file changed, 1 insertion(+), 1 deletion(-)
+
+用户在bravo仓库中将data/number.txt的内容修改为12并提交本次修改。结果如下：
+
+![27-12-bravo.png](images/git-from-the-inside-out/27-12-bravo.png)
+
+    bravo $ cd ../alpha/
+    alpha $ git fetch bravo master
+    remote: Enumerating objects: 7, done.
+    remote: Counting objects: 100% (7/7), done.
+    remote: Total 4 (delta 0), reused 0 (delta 0)
+    Unpacking objects: 100% (4/4), done.
+    From ../bravo
+     * branch            master     -&gt; FETCH_HEAD
+     * [new branch]      master     -&gt; bravo/master
+
+用户重新的回到alpha仓库，并从bravo中获取master分支到alpha中。这个过程分为四步：
+
+第一，git 获取bravo中master分支指向的commit的哈希值。在这里是 commit 12对应的哈希值。
+
+第二，Git列出bravo仓库中commit 12依赖的所有对象：commit 对象， tree对象、blob对象、所有祖先commit对象及它们对应的树形图包含的对象。然后Git删除alpha仓库中已经包含的对象。最后将剩余不同复制到aplha/.git/objects
+
+第三，记录commit 12 的哈希值。`alpha/.git/refs/remotes/bravo/master`的内容设置为指向commit 12的哈希值。
+
+第四，alpha/.git/FETCH_HEAD的内容设置为
+
+    f8f1d2c62a3666b80910e2182867a45d9040b48e                branch &apos;master&apos; of ../bravo
+
+这表明最新的的fetch命令从bravo中获取了master分支的f8f1指向的commit 对象。
+
+![28-12-fetched-to-alpha.png](images/git-from-the-inside-out/28-12-fetched-to-alpha.png)
+
+树形图属性：对象是可以复制的。这意味着整个仓库的历史可以在不同的仓库中共享。
+
+树形图属性：一个仓库可以存储规程仓库的分支引用如alpha/.git/refs/remotes/bravo/master.这意味仓库中可以将本地状态存储在远程仓库中。如果远程仓库更新的了，那么本地获取的分支将会过时。
+
+## 合并FETCH_HEAD
+
+---
+
+    alpha $ git merge FETCH_HEAD
+    Updating 1f727e1..f8f1d2c
+    Fast-forward
+     data/number.txt | 2 +-
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+用户将FETCH_HEAD指向的分支合并到master分支中。注意FETCH_HEAD也只不过是一个引用而已。这个过程与先前的合并本地分支没有什么不同，在这里，Git做了一个fast-forward合并，将master指向了commit 12. 合并后的树形图表示如下：
+
+![29-12-merged-to-alpha.png](images/git-from-the-inside-out/29-12-merged-to-alpha.png)
+
+### 从 远程仓库中拉取一个分支
+
+---
+
+    alpha $ git pull bravo master
+    From ../bravo
+     * branch            master     -&gt; FETCH_HEAD
+    Already up to date.
+
+用户将alpha中的master分支推送到时远程仓库bravo中。pull
+
+其实就是 fetch 和merge FETCH_HEAD的合并操作。Git完成这两个命令后，并报告master is Already up to date.
+
+## 复制一个仓库
+
+---
+
+    alpha $ cd ..
+    git $ git clone alpha charlie
+    Cloning into &apos;charlie&apos;...
+    done.
+    git $ ls
+    alpha  bravo  charlie
+
+用户在移动到git目录下。他克隆alpha仓库存储在charlie。克隆的charlie仓库与之前cp命令生成的bravo仓库类似。Git创建一个新的目录charlie，将charlie初始化为一个Git仓库。将alpha作为一个远程仓库。将alpha这个远程仓库命名为origin.使用fetch origin并merge FETCH_HEAD.
+
+    git $ cat charlie/.git/config
+    [core]
+            repositoryformatversion = 0
+            filemode = true
+            bare = false
+            logallrefupdates = true
+    [remote &quot;origin&quot;]
+            url = /root/git/alpha
+            fetch = +refs/heads/*:refs/remotes/origin/*
+    [branch &quot;master&quot;]
+            remote = origin
+            merge = refs/heads/master
+
+## 推送分支到远程仓库中一个被签出的分支中
+
+---
+
+    git $ cd alpha/
+    alpha $ printf &apos;13&apos; &gt; data/number.txt
+    alpha $ git add data/number.txt
+    alpha $ git commit -m &apos;13&apos;
+    [master b92ab33] 13
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+用户进入alpha仓库，修改data/number.txt文件的内容为13.并提交这次修改为commit 13.
+
+    alpha $ git remote add charlie ../charlie
+
+将charlie设置为alpha的一个远程仓库
+
+    alpha $ git push charlie master
+    Enumerating objects: 7, done.
+    Counting objects: 100% (7/7), done.
+    Writing objects: 100% (4/4), 277 bytes | 277.00 KiB/s, done.
+    Total 4 (delta 0), reused 0 (delta 0)
+    remote: error: refusing to update checked out branch: refs/heads/master
+    remote: error: By default, updating the current branch in a non-bare repository
+    remote: is denied, because it will make the index and work tree inconsistent
+    remote: with what you pushed, and will require &apos;git reset --hard&apos; to match
+    remote: the work tree to HEAD.
+    remote:
+    remote: You can set the &apos;receive.denyCurrentBranch&apos; configuration variable
+    remote: to &apos;ignore&apos; or &apos;warn&apos; in the remote repository to allow pushing into
+    remote: its current branch; however, this is not recommended unless you
+    remote: arranged to update its work tree to match what you pushed in some
+    remote: other way.
+    remote:
+    remote: To squelch this message and still keep the default behaviour, set
+    remote: &apos;receive.denyCurrentBranch&apos; configuration variable to &apos;refuse&apos;.
+    To ../charlie
+     ! [remote rejected] master -&gt; master (branch is currently checked out)
+    error: failed to push some refs to &apos;../charlie&apos;
+
+用户将alpha的master分支推送到charlie中
+
+commit 13所关联的所有对象都被复制到charlie仓库中。
+
+这时，推送操作失败。Git向用户说明了失败的原因。远程仓库中的分支被checkout到工作空间中，alpha的Push操作会更新远程仓库的index和HEAD。如果有人远程仓库的工作空间中编辑，push操作将会导致混乱。所以Git阻止推送操作。
+
+但是，用户想建一个仓库中，用户可以随时推送到这个仓库中，下面将建立这个一个仓库：
+
+## 克隆一个bare仓库
+
+---
+
+    alpha $ cd ..
+    git $ git clone alpha delta --bare
+    Cloning into bare repository &apos;delta&apos;...
+    done.
+
+用户克隆一个空的仓库。这个克隆操作与之后的克隆有所不同。config文件表示这个仓库是bare的。
+
+    delta $ cat config
+    [core]
+            repositoryformatversion = 0
+            filemode = true
+            **bare = true**
+    [remote &quot;origin&quot;]
+            url = /root/git/alpha
+
+所有原本存储在.git中的文件现在都存储在根目录中。并且没有了原本工作空间中的文件。
+
+    # bare repo
+    delta $ ls
+    branches  config  description  HEAD  hooks  info  objects  packed-refs  refs
+
+    # ordinary repo
+    delta $ ls ../alpha/  ../alpha/.git -ah
+    ../alpha/:
+    .  ..  data  .git
+
+    **../alpha/.git:**
+    .   branches        config       FETCH_HEAD  hooks  info  objects    refs
+    ..  COMMIT_EDITMSG  description  HEAD        index  logs  ORIG_HEAD
+
+![30-13-alpha-cloned-to-delta-bare.png](images/git-from-the-inside-out/30-13-alpha-cloned-to-delta-bare.png)
+
+### 推送一个分支到bare仓库中
+
+---
+
+    delta $ cd ../alpha/
+    alpha $ git remote add delta ../delta
+    alpha $ printf &apos;14&apos; &gt; data/number.txt
+    alpha $ git commit -am&apos;14&apos;
+    [master f001318] 14
+     1 file changed, 1 insertion(+), 1 deletion(-)
+
+用户进入alpha仓库，将delta设置远程仓库，修改data/number.txt中的内容为14，并提交这次操作。
+
+![31-14-alpha.png](images/git-from-the-inside-out/31-14-alpha.png)
+
+    alpha $ git push delta master
+    Enumerating objects: 7, done.
+    Counting objects: 100% (7/7), done.
+    Writing objects: 100% (4/4), 276 bytes | 276.00 KiB/s, done.
+    Total 4 (delta 0), reused 0 (delta 0)
+    To ../delta
+       b92ab33..f001318  master -&gt; master
+
+用户将alpha的master分支推送到delta。这个push操作分为三步：
+
+第一，alpha的master分支中的commit 14所需要的所有对象将会从alpha/.git/objects复制到delta/objects中。
+
+第二，delta/refs/heads/master更新的commit 14
+
+    delta $ cat HEAD
+    ref: refs/heads/master
+    delta $ cat refs/heads/master
+    f0013185d0a45ecf7f7be00692ddfa6359954513
+
+    delta $ cd ../alpha
+    alpha $ cat .git/HEAD
+    ref: refs/heads/master
+    alpha $ cat .git/refs/heads/master
+    f0013185d0a45ecf7f7be00692ddfa6359954513
+
+第三，alpha/.git/refs/remotes/delta/master更新为指向commit 14.这时，alpha将自己的最新状态同步到delta中。
+
+![32-14-pushed-to-delta.png](images/git-from-the-inside-out/32-14-pushed-to-delta.png)
+
+## 总结
+
+---
+
+Git 建立在这个抽象的树形图中。几乎所有的Git命令都会操作这个树形图。要想深入理解Git，重点关注这个树形图的属性，而不是死记命令。
+
+为了深入学习Git，探索.git目录中的内容是不可避免。
+
+没有涉及到的命令：
+
+git prune →用于删除一个引用无法关联到的所有对象，如果用户运行这个命令，会导致内容的丢失。
+
+git stash → 将工作空间中与HEAD指向的提交之间的diff存储在一个安全的地方，它们可以在后面被检索出来。用于临时保存内容。
+
+git rebase → 这个命今用于添加、编辑和删除objects中存储的commit。</code></pre>
       
     </div>
     <footer class="article-footer">
