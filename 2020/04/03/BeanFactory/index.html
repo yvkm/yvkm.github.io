@@ -15,7 +15,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://github.com/yvkm/2020/04/03/BeanFactory/images/spring-beanfactory/beanfactory.png">
 <meta property="article:published_time" content="2020-04-03T06:47:16.797Z">
-<meta property="article:modified_time" content="2020-04-03T07:36:51.872Z">
+<meta property="article:modified_time" content="2020-04-03T11:59:54.302Z">
 <meta property="article:author" content="yvkm">
 <meta property="article:tag" content="Spring Framework">
 <meta property="article:tag" content="BeanFactory">
@@ -111,7 +111,12 @@
 <li><strong>生命周期管理</strong>:容器用于控制应用对象运行的生存周期，最起码，容器必须将“创建新对象“的逻辑从使用者那么抽象出来。更加完完善的生命周期管理可以包括诸多回调机制。在需要激活对象或容器本身准备销毁时，可以通过这些回调机制通知被管理的对象。</li>
 <li>查找服务：容器应该提供某种途径，用于获得受管对象的引用。容器的查找功能将“对业务对象实现细节的了解”从使用者那里抽象出来，将其隐藏在容器内部。查找服务是容器的核心服务，也就是说容器的核心是一个工厂。</li>
 <li><strong>配置管理</strong>: 容器需要提供统一的方法来配置运行其中的对象，并且允许对象的参数化。简单的配置值应该从Java中抽取出来，这样改变配置时就不需要重新编译代码。</li>
-<li><strong>依赖管理</strong>: 容器不仅可以管理<code>String</code>, <code>int</code>之类的简单类型配置，还可以管理其中各个对象之间的关系。<br>通常还提供增值服务:</li>
+<li><strong>依赖管理</strong>: 容器不仅可以管理<code>String</code>, <code>int</code>之类的简单类型配置，还可以管理其中各个对象之间的关系。</li>
+</ul>
+<a id="more"></a>
+
+<p>通常还提供增值服务:</p>
+<ul>
 <li><strong>企业级服务</strong>: 如事务管理和其他声明性服务</li>
 <li><strong>线程管理</strong>: 对受管对象的操作，容器可以提供一个线程模型。</li>
 <li><strong>对象池</strong>: 提供一个实例池来管理对象</li>
@@ -220,7 +225,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://github.com/yvkm/2020/04/03/BeanFactory/" data-id="ck8jvao4l0000ooap3x69got1" class="article-share-link" data-share="baidu" data-title="BeanFactory">分享到</a>
+        <a data-url="http://github.com/yvkm/2020/04/03/BeanFactory/" data-id="ck8k51evv0001z4ap4cm6d4nf" class="article-share-link" data-share="baidu" data-title="BeanFactory">分享到</a>
       
 
       
@@ -263,47 +268,6 @@
     <h3 class="widget-title">标签</h3>
     <div class="widget">
       <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BeanFactory/" rel="tag">BeanFactory</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Framework/" rel="tag">Spring Framework</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/" rel="tag">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a><span class="tag-list-count">1</span></li></ul>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签云</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/BeanFactory/" style="font-size: 10px;">BeanFactory</a> <a href="/tags/Spring-Framework/" style="font-size: 10px;">Spring Framework</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">归档</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">3</span></li></ul>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">近期文章</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2020/04/03/BeanFactory/">BeanFactory</a>
-          </li>
-        
-          <li>
-            <a href="/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">Redis分布式锁</a>
-          </li>
-        
-          <li>
-            <a href="/2020/04/02/Git%20from%20the%20inside%20out/">深入浅出Git原理</a>
-          </li>
-        
-      </ul>
     </div>
   </div>
 
