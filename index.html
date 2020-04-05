@@ -8,10 +8,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta property="og:type" content="website">
 <meta property="og:title" content="yvkm">
-<meta property="og:url" content="http://github.com/yvkm/index.html">
+<meta property="og:url" content="http://yvkm.github.io/index.html">
 <meta property="og:site_name" content="yvkm">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:author" content="yvkm">
 <meta name="twitter:card" content="summary">
   
   
@@ -59,7 +58,7 @@
           <input name=tn type=hidden value="bds">
           <input name=cl type=hidden value="3">
           <input name=ct type=hidden value="2097152">
-          <input type="hidden" name="si" value="github.com/yvkm">
+          <input type="hidden" name="si" value="yvkm.github.io">
         </form>
       </div>
     </div>
@@ -73,123 +72,10 @@
     <div class="outer">
       <section id="main">
   
-    <article id="post-BeanFactory" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-git-from-the-inside-out" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2020/04/03/BeanFactory/" class="article-date">
-  <time datetime="2020-04-03T06:47:16.797Z" itemprop="datePublished">2020-04-03</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Spring-Framework/">Spring Framework</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/04/03/BeanFactory/">BeanFactory</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="什么是容器"><a href="#什么是容器" class="headerlink" title="什么是容器"></a>什么是容器</h2><hr>
-<p>所谓容器，是指应用代码的运行框架。应用对象(大多数时候是业务对象)在容器里运行，也就是说”被容器管理”.<br>任何容器都应该提供下列服务：</p>
-<ul>
-<li><strong>生命周期管理</strong>:容器用于控制应用对象运行的生存周期，最起码，容器必须将“创建新对象“的逻辑从使用者那么抽象出来。更加完完善的生命周期管理可以包括诸多回调机制。在需要激活对象或容器本身准备销毁时，可以通过这些回调机制通知被管理的对象。</li>
-<li>查找服务：容器应该提供某种途径，用于获得受管对象的引用。容器的查找功能将“对业务对象实现细节的了解”从使用者那里抽象出来，将其隐藏在容器内部。查找服务是容器的核心服务，也就是说容器的核心是一个工厂。</li>
-<li><strong>配置管理</strong>: 容器需要提供统一的方法来配置运行其中的对象，并且允许对象的参数化。简单的配置值应该从Java中抽取出来，这样改变配置时就不需要重新编译代码。</li>
-<li><strong>依赖管理</strong>: 容器不仅可以管理<code>String</code>, <code>int</code>之类的简单类型配置，还可以管理其中各个对象之间的关系。</li>
-</ul>
-        
-          <p class="article-more-link">
-            <a href="/2020/04/03/BeanFactory/#more">Read More</a>
-          </p>
-        
-      
-    </div>
-    <footer class="article-footer">
-      
-        <a data-url="http://github.com/yvkm/2020/04/03/BeanFactory/" data-id="ck8k51evv0001z4ap4cm6d4nf" class="article-share-link" data-share="baidu" data-title="BeanFactory">分享到</a>
-      
-
-      
-
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/BeanFactory/" rel="tag">BeanFactory</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Framework/" rel="tag">Spring Framework</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Redis分布式锁" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" class="article-date">
-  <time datetime="2020-04-02T11:29:40.047Z" itemprop="datePublished">2020-04-02</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Redis/">Redis</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">Redis分布式锁</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>为什么要使用分布式锁？<br>使用锁的目的是确保在可能尝试执行同一工作的多个节点中，只有一个节点实际执行。这项工作可能是将数据写入共享的存储系统，可能是执行一些计算，调用某些外部API等。从高层次上讲，在分布式应用程序中使用锁有两个原因：<strong>效率</strong>和<strong>正确性</strong>。</p>
-<ul>
-<li><strong>效率</strong>: 锁可以避免不必要地重复执行两次相同的工作(例如，一些昂贵的计算).如果锁定失败并且两个节点最终完成相同的工作，则成本会增加(计算多一次所产生的费用)或带有不便(用户最终两次收到相同的邮件).</li>
-<li><strong>正确性</strong>： 锁可以防止并发的进程扰乱系统的状态，如果锁定失败，并且两个节点同时处理一条数据，则结果是数据丢失、永久性不一致、文件损坏、给患者的药物剂量错误等其他严重的问题。<br>在使用锁时，你需要非常清楚在哪种情况下。</li>
-</ul>
-        
-          <p class="article-more-link">
-            <a href="/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/#more">Read More</a>
-          </p>
-        
-      
-    </div>
-    <footer class="article-footer">
-      
-        <a data-url="http://github.com/yvkm/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" data-id="ck8k51ewp000cz4apebwdcmy6" class="article-share-link" data-share="baidu" data-title="Redis分布式锁">分享到</a>
-      
-
-      
-
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/" rel="tag">redis</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Git_from_the_inside_out" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/04/02/Git_from_the_inside_out/" class="article-date">
-  <time datetime="2020-04-02T05:47:11.859Z" itemprop="datePublished">2020-04-02</time>
+    <a href="/2020/04/01/git-from-the-inside-out/" class="article-date">
+  <time datetime="2020-04-01T13:13:18.000Z" itemprop="datePublished">2020-04-01</time>
 </a>
     
   <div class="article-category">
@@ -204,7 +90,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2020/04/02/Git_from_the_inside_out/">深入浅出Git原理</a>
+      <a class="article-title" href="/2020/04/01/git-from-the-inside-out/">深入浅出Git原理</a>
     </h1>
   
 
@@ -223,20 +109,133 @@
 </ul>
         
           <p class="article-more-link">
-            <a href="/2020/04/02/Git_from_the_inside_out/#more">Read More</a>
+            <a href="/2020/04/01/git-from-the-inside-out/#more">Read More</a>
           </p>
         
       
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/" data-id="ck8lfs59f00003gaph4wu3pw6" class="article-share-link" data-share="baidu" data-title="深入浅出Git原理">分享到</a>
+        <a data-url="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/" data-id="ck8mda4cl0001agap4vjzedzr" class="article-share-link" data-share="baidu" data-title="深入浅出Git原理">分享到</a>
       
 
       
 
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/" rel="tag">git</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/" rel="tag">Git</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-redis-lock" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/02/03/redis-lock/" class="article-date">
+  <time datetime="2020-02-03T11:12:18.000Z" itemprop="datePublished">2020-02-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Redis/">Redis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/02/03/redis-lock/">Redis分布式锁</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>为什么要使用分布式锁？<br>使用锁的目的是确保在可能尝试执行同一工作的多个节点中，只有一个节点实际执行。这项工作可能是将数据写入共享的存储系统，可能是执行一些计算，调用某些外部API等。从高层次上讲，在分布式应用程序中使用锁有两个原因：<strong>效率</strong>和<strong>正确性</strong>。</p>
+<ul>
+<li><strong>效率</strong>: 锁可以避免不必要地重复执行两次相同的工作(例如，一些昂贵的计算).如果锁定失败并且两个节点最终完成相同的工作，则成本会增加(计算多一次所产生的费用)或带有不便(用户最终两次收到相同的邮件).</li>
+<li><strong>正确性</strong>： 锁可以防止并发的进程扰乱系统的状态，如果锁定失败，并且两个节点同时处理一条数据，则结果是数据丢失、永久性不一致、文件损坏、给患者的药物剂量错误等其他严重的问题。<br>在使用锁时，你需要非常清楚在哪种情况下。</li>
+</ul>
+        
+          <p class="article-more-link">
+            <a href="/2020/02/03/redis-lock/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yvkm.github.io/2020/02/03/redis-lock/" data-id="ck8mda4d5000cagap8obnfz1n" class="article-share-link" data-share="baidu" data-title="Redis分布式锁">分享到</a>
+      
+
+      
+
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-beanfactory" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/05/beanfactory/" class="article-date">
+  <time datetime="2019-06-05T14:15:18.000Z" itemprop="datePublished">2019-06-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Spring-Framework/">Spring Framework</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/05/beanfactory/">BeanFactory</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="什么是容器"><a href="#什么是容器" class="headerlink" title="什么是容器"></a>什么是容器</h2><hr>
+<p>所谓容器，是指应用代码的运行框架。应用对象(大多数时候是业务对象)在容器里运行，也就是说”被容器管理”.<br>任何容器都应该提供下列服务：</p>
+<ul>
+<li><strong>生命周期管理</strong>:容器用于控制应用对象运行的生存周期，最起码，容器必须将“创建新对象“的逻辑从使用者那么抽象出来。更加完完善的生命周期管理可以包括诸多回调机制。在需要激活对象或容器本身准备销毁时，可以通过这些回调机制通知被管理的对象。</li>
+<li>查找服务：容器应该提供某种途径，用于获得受管对象的引用。容器的查找功能将“对业务对象实现细节的了解”从使用者那里抽象出来，将其隐藏在容器内部。查找服务是容器的核心服务，也就是说容器的核心是一个工厂。</li>
+<li><strong>配置管理</strong>: 容器需要提供统一的方法来配置运行其中的对象，并且允许对象的参数化。简单的配置值应该从Java中抽取出来，这样改变配置时就不需要重新编译代码。</li>
+<li><strong>依赖管理</strong>: 容器不仅可以管理<code>String</code>, <code>int</code>之类的简单类型配置，还可以管理其中各个对象之间的关系。</li>
+</ul>
+        
+          <p class="article-more-link">
+            <a href="/2019/06/05/beanfactory/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yvkm.github.io/2019/06/05/beanfactory/" data-id="ck8mda4cc0000agaph1apgj8z" class="article-share-link" data-share="baidu" data-title="BeanFactory">分享到</a>
+      
+
+      
+
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/BeanFactory/" rel="tag">BeanFactory</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Framework/" rel="tag">Spring Framework</a></li></ul>
 
     </footer>
   </div>
@@ -263,7 +262,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BeanFactory/" rel="tag">BeanFactory</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Framework/" rel="tag">Spring Framework</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/" rel="tag">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BeanFactory/" rel="tag">BeanFactory</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/" rel="tag">Git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Framework/" rel="tag">Spring Framework</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 

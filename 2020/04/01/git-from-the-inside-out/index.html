@@ -9,47 +9,46 @@
   <meta name="description" content="经作者同意翻译成中文，有所增删。欢迎指正不足之处，转载注明出处。原文链接 作者 本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。 本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在Git的真正实现上。从Git的实现角度去理解Git可以让你更加清楚Git做了什么，它正在">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深入浅出Git原理">
-<meta property="og:url" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/index.html">
+<meta property="og:url" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/index.html">
 <meta property="og:site_name" content="yvkm">
 <meta property="og:description" content="经作者同意翻译成中文，有所增删。欢迎指正不足之处，转载注明出处。原文链接 作者 本文解析Git的工作原理，假定你已经能够熟练使用Git对你的项目进行版本控制。 本文着重介绍Git底层使用的图结构(graph structure)和该图结构的属性决定了Git的特性或行为。对Git的理解不能建立在经验上，而是建立在Git的真正实现上。从Git的实现角度去理解Git可以让你更加清楚Git做了什么，它正在">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/1-a1-tree-graph.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/2-a1-commit.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/3-a1-refs.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/4-a1-wc-and-index.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/5-a1-wc-number-set-to-2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/6-a1-wc-and-index-number-set-to-2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/7-a2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/8-a2-just-objects-commits-and-refs.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/9-a2-detached-head.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/10-a3-detached-head.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/11-a3-on-deputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/12-a3-on-master-on-a2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/13-a3ondeputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/14-a3-on-master-on-a2.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/15-a3-on-master.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/16-a4-b3-on-deputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/17-a4-b3-on-deputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/18-b4-on-deputy.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/19-b4-master-deputy-on-b4.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/20-b5-on-deputy-b6-on-master.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/21-b6-on-master-with-merge-head.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/23-b11-with-objects-wc-and-index.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/24-b11-letter-removed-from-wc-and-index.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/25-11.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/26-11-cp-alpha-to-bravo.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/27-12-bravo.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/28-12-fetched-to-alpha.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/29-12-merged-to-alpha.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/30-13-alpha-cloned-to-delta-bare.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/31-14-alpha.png">
-<meta property="og:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/32-14-pushed-to-delta.png">
-<meta property="article:published_time" content="2020-04-02T05:47:11.859Z">
-<meta property="article:modified_time" content="2020-04-03T11:57:07.500Z">
-<meta property="article:author" content="yvkm">
-<meta property="article:tag" content="git">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/1-a1-tree-graph.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/2-a1-commit.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/3-a1-refs.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/4-a1-wc-and-index.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/5-a1-wc-number-set-to-2.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/6-a1-wc-and-index-number-set-to-2.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/7-a2.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/8-a2-just-objects-commits-and-refs.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/9-a2-detached-head.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/10-a3-detached-head.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/11-a3-on-deputy.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/12-a3-on-master-on-a2.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/13-a3ondeputy.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/14-a3-on-master-on-a2.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/15-a3-on-master.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/16-a4-b3-on-deputy.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/17-a4-b3-on-deputy.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/18-b4-on-deputy.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/19-b4-master-deputy-on-b4.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/20-b5-on-deputy-b6-on-master.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/21-b6-on-master-with-merge-head.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/23-b11-with-objects-wc-and-index.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/24-b11-letter-removed-from-wc-and-index.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/25-11.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/26-11-cp-alpha-to-bravo.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/27-12-bravo.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/28-12-fetched-to-alpha.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/29-12-merged-to-alpha.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/30-13-alpha-cloned-to-delta-bare.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/31-14-alpha.png">
+<meta property="og:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/32-14-pushed-to-delta.png">
+<meta property="article:published_time" content="2020-04-01T13:13:18.000Z">
+<meta property="article:modified_time" content="2020-04-05T01:28:09.166Z">
+<meta property="article:tag" content="Git">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/images/git-from-the-inside-out/1-a1-tree-graph.png">
+<meta name="twitter:image" content="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/1-a1-tree-graph.png">
   
   
     <link rel="icon" href="/favicon.png">
@@ -96,7 +95,7 @@
           <input name=tn type=hidden value="bds">
           <input name=cl type=hidden value="3">
           <input name=ct type=hidden value="2097152">
-          <input type="hidden" name="si" value="github.com/yvkm">
+          <input type="hidden" name="si" value="yvkm.github.io">
         </form>
       </div>
     </div>
@@ -108,10 +107,10 @@
 </script>
 </header>
     <div class="outer">
-      <section id="main"><article id="post-Git_from_the_inside_out" class="article article-type-post" itemscope itemprop="blogPost">
+      <section id="main"><article id="post-git-from-the-inside-out" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2020/04/02/Git_from_the_inside_out/" class="article-date">
-  <time datetime="2020-04-02T05:47:11.859Z" itemprop="datePublished">2020-04-02</time>
+    <a href="/2020/04/01/git-from-the-inside-out/" class="article-date">
+  <time datetime="2020-04-01T13:13:18.000Z" itemprop="datePublished">2020-04-01</time>
 </a>
     
   <div class="article-category">
@@ -226,12 +225,12 @@
 <figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alpha</span> $ git <span class="keyword">cat</span>-<span class="keyword">file</span> -p ffe2</span><br><span class="line">040000 tree 0eed1217a2947f4930583229987d90fe5e8e0b74</span><br></pre></td></tr></table></figure>
 
 <p><code>commit a1</code> 提交的树形图可以表示为</p>
-<p><img src="images/git-from-the-inside-out/1-a1-tree-graph.png" alt="a1提交的树形图"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/1-a1-tree-graph.png" alt="a1提交的树形图"></p>
 <h2 id="创建一个commit对象"><a href="#创建一个commit对象" class="headerlink" title="创建一个commit对象"></a>创建一个commit对象</h2><hr>
 <p><code>git commit</code>在创建完上面的树形图后创建一个commit对象。这个commit对象同样存储在<code>.git/objects</code>中</p>
 <figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git cat-file -t a89e</span><br><span class="line">commit</span><br><span class="line">alpha $ git cat-file -p a89e</span><br><span class="line">tree ffe298c3ce8bb07326f888907996eaa48d266db4</span><br><span class="line">author xiejianxun &lt;<span class="symbol">xiejianxun@</span>outlook.comm&gt; <span class="number">1583742597</span> +<span class="number">0800</span></span><br><span class="line">committer xiejianxun &lt;<span class="symbol">xiejianxun@</span>outlook.comm&gt; <span class="number">1583742597</span> +<span class="number">0800</span></span><br><span class="line"></span><br><span class="line">a1</span><br></pre></td></tr></table></figure>
 <p>第三行表示<code>commit a1</code>对象指向一个tree对象,后面的数值是这个tree对象的哈希值。这个哈希值上面有提到，它就是表示项目的根目录。在当前环境下，就是<code>alpha</code>目录。倒数三四行表示作者和提交人的信息(之所以分开，是因为有时提交人不一定是作者）,最后一行表示注释。</p>
-<p><img src="images/git-from-the-inside-out/2-a1-commit.png" alt="commit a1对应的commit对象指向的树形图"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/2-a1-commit.png" alt="commit a1对应的commit对象指向的树形图"></p>
 <h2 id="指向当前分支最新的commit对象"><a href="#指向当前分支最新的commit对象" class="headerlink" title="指向当前分支最新的commit对象"></a>指向当前分支最新的commit对象</h2><hr>
 <p><code>git command</code>最后要做的是记录当前分支的最新的commit对象</p>
 <p>那么，在哪里记录着当前分支呢？在Git中，<code>HEAD</code> 文件记录着当前工作的分支，文件位于<code>.git/HEAD</code></p>
@@ -242,20 +241,20 @@
 <figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alpha</span> $ <span class="keyword">cat</span> .git/refs/heads/master</span><br><span class="line">a89ea183a48e484c318335fd25c8adcc82608c35</span><br><span class="line"><span class="keyword">alpha</span> $ git <span class="keyword">cat</span>-<span class="keyword">file</span> -t a89e</span><br><span class="line">commit</span><br></pre></td></tr></table></figure>
 <p><code>master</code>文件中存储了一个哈希值，它表示一个commit对象。(如果你也跟着做，这个哈希值可能不一致，因为commit对象包含提交用户的信息）</p>
 <p>将<code>HEAD</code>和<code>master</code>添加到Git的树形图中的结果如下</p>
-<p><img src="images/git-from-the-inside-out/3-a1-refs.png" alt="HEAD指向master，master指向commit a1"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/3-a1-refs.png" alt="HEAD指向master，master指向commit a1"></p>
 <p>Git 对象都是存储在特殊的文件中(需要<code>git cat-file</code>才能查看里面的内容），<code>master</code>和<code>HEAD</code>存储在普通的文件中(直接用<code>cat</code>命令可以查看内容）</p>
 <p>注意：<code>HEAD</code>指向<code>master</code>在commit之前已经完成。<code>master</code>现在指定了最新的commit对象。</p>
 <p>以上是第一次提交的情况。</p>
 <h2 id="非第一次提交的提交"><a href="#非第一次提交的提交" class="headerlink" title="非第一次提交的提交"></a>非第一次提交的提交</h2><hr>
-<p>下面是一个包含了<code>working copy</code>(工作副本)和<code>index</code>(暂存区)的树形图<br><img src="images/git-from-the-inside-out/4-a1-wc-and-index.png" alt="commit a1与工作空间和index之间的关系"></p>
+<p>下面是一个包含了<code>working copy</code>(工作副本)和<code>index</code>(暂存区)的树形图<br><img src="/2020/04/01/git-from-the-inside-out/4-a1-wc-and-index.png" alt="commit a1与工作空间和index之间的关系"></p>
 <p>现在<code>working copy</code>、<code>index</code>和<code>commit a1</code>中的<code>data/letter.txt</code>和<code>data/number.txt</code>都含有相同的内容的<code>a</code>和<code>1</code>. <code>index</code>和<code>HEAD</code>都使用哈希值指定它们引用的blob对象，但是工作空间中的内容是用文本存储在不同的地方(<code>alpha</code>目录下)。</p>
 <p>执行以下的命令后</p>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alpha <span class="variable">$</span> printf <span class="string">'2'</span> &gt; <span class="keyword">data</span>/number.txt</span><br><span class="line">alpha <span class="variable">$</span> git add <span class="keyword">data</span>/number.txt</span><br></pre></td></tr></table></figure>
 
 <p>树形图会发生变化:首先工作空间中的<code>data/number.txt</code>文件的发生变化，内容从<code>1</code>变成<code>2</code>. 但是，<code>HEAD</code>,<code>index</code>不会变化,依然指向原来的位置。</p>
-<p><img src="images/git-from-the-inside-out/5-a1-wc-number-set-to-2.png" alt="修改工作空间中的文件变化"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/5-a1-wc-number-set-to-2.png" alt="修改工作空间中的文件变化"></p>
 <p>执行<code>git add</code>后，<code>index</code>变化。它会在<code>.git/objects</code>下创建一个blob对象，这个对象存储着<code>2</code>.然后，<code>index</code>中的关于<code>data/number.txt</code>的条目的哈希值更改为这个新生成的blob对象的哈希值。</p>
-<p><img src="images/git-from-the-inside-out/6-a1-wc-and-index-number-set-to-2.png" alt="git add后index的变化"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/6-a1-wc-and-index-number-set-to-2.png" alt="git add后index的变化"></p>
 <figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git commit -m 'a2'</span><br><span class="line">[master <span class="number">8734e79</span>] a2</span><br><span class="line"> <span class="number">1</span> file <span class="section">changed</span>, <span class="number">1</span> insertion(+), <span class="number">1</span> deletion(-)</span><br></pre></td></tr></table></figure>
 <p>用户再次执行commit后，产生的影响与之前的commit一样.(本次提交使用<code>commit a2</code> 表示后面所有提交类似)</p>
 <p>首先，创建一个新的树形图表示<code>index</code>中的内容。</p>
@@ -268,8 +267,8 @@
 
 <p>第二行指向了新的<code>root</code> tree对象(表示根目录的tree对象称为<code>root</code>,在这里是<code>alpha</code>)。第二行指向了<code>commit a1</code>对象。它是<code>commit a2</code>对象的父亲。为了在生成新的<code>commit a2</code>对象，Git需要先找到父commit对象：Git首先找到<code>HEAD</code>，通过<code>HEAD</code>定位到<code>master</code>，然后通过<code>master</code>找到<code>commit a1</code>对象。</p>
 <p>最后，<code>master</code>文件中的内容修改为指定新的commit对象。</p>
-<p><img src="images/git-from-the-inside-out/7-a2.png" alt="commit a2"></p>
-<p><img src="images/git-from-the-inside-out/8-a2-just-objects-commits-and-refs.png" alt="commit a2 没有工作空间和index的树形图"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/7-a2.png" alt="commit a2"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/8-a2-just-objects-commits-and-refs.png" alt="commit a2 没有工作空间和index的树形图"></p>
 <p>从上图可以看出，在<code>commit a2</code>时，<code>data/letter.txt</code>会利用<code>commit</code>中的blob对象，这样可以减少空间占用。</p>
 <p>下面总结部分的<strong>树形图属性</strong>：</p>
 <ul>
@@ -301,19 +300,19 @@
 <figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">alpha $ cat .git/HEAD</span><br><span class="line"><span class="number">8734e794</span><span class="keyword">c</span><span class="number">8</span>a<span class="number">443</span><span class="keyword">c</span><span class="number">0</span>dc<span class="number">3e04</span><span class="keyword">cc</span><span class="number">91</span>a<span class="number">2</span>f<span class="number">835</span><span class="keyword">c</span><span class="number">77</span>b<span class="number">2</span><span class="keyword">c</span><span class="number">9</span>d</span><br><span class="line">alpha $ git status</span><br><span class="line">HEAD detached at <span class="number">8734e79</span></span><br><span class="line">nothing <span class="keyword">to</span> commit, working tree clean</span><br></pre></td></tr></table></figure>
 <p>将<code>HEAD</code>的内容设置为一个哈希值将会使Git仓库进入分离头指针状态( detached HEAD state).</p>
 <p>从下图可以看出，<code>HEAD</code>直接指向了<code>commit a2</code>,而不是<code>master</code>。</p>
-<p><img src="images/git-from-the-inside-out/9-a2-detached-head.png" alt="处理分离头指针状态"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/9-a2-detached-head.png" alt="处理分离头指针状态"></p>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">alpha <span class="variable">$</span> printf <span class="string">'3'</span> &gt; <span class="keyword">data</span>/number.txt</span><br><span class="line">alpha <span class="variable">$</span> git add <span class="keyword">data</span>/number.txt</span><br><span class="line">alpha <span class="variable">$</span> git commit <span class="literal">-m</span> <span class="string">'a3'</span></span><br><span class="line">[<span class="type">detached</span> <span class="type">HEAD</span> <span class="number">50</span><span class="type">ac643</span>] a3</span><br><span class="line"> <span class="number">1</span> file changed, <span class="number">1</span> insertion(+), <span class="number">1</span> deletion(-)</span><br></pre></td></tr></table></figure>
 <p>用户将<code>data/number.txt</code>中的内容改变成<code>3</code>，并提交这次更改。Git通过HEAD找到这次提交的父commit。这次查找父commit不会再通过分支引用查找，因为HEAD中直接存储的就是commit对象的哈希值。它返回的是<code>commit a2</code>对象的哈希值。</p>
 <p>Git更新的HEAD的值，HEAD同样直接指向了<code>commit a3</code>。仓库依然处于detached HEAD 状态。<code>commit a3</code> 不在任何分支中，这样一旦HEAD从新指向<code>commit a2</code>,  <code>commit a3</code>就会很容易丢失，因为没有任何其他引用指向这次引用。</p>
 <p>这次提交的示意图如下(省略了<code>commit a3</code>的tree &amp; blob对象）：</p>
-<p><img src="images/git-from-the-inside-out/10-a3-detached-head.png" alt="commit a3处于分离头指针状态"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/10-a3-detached-head.png" alt="commit a3处于分离头指针状态"></p>
 <h2 id="创建一个分支"><a href="#创建一个分支" class="headerlink" title="创建一个分支"></a>创建一个分支</h2><hr>
 <figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">alpha</span> $ git <span class="keyword">branch </span>deputy</span><br></pre></td></tr></table></figure>
 
 <p>用户创建了一个新分支：<code>deputy</code>。这条命令会创建一个新的文件<code>.git/refs/heads/deputy</code>，deputy文件中存储着HEAD的指向的commit对象的哈希值。在这是就是 <code>commit a3</code>的哈希值,这样<code>commit a3</code>就不容易丢失了</p>
 <p><strong>树形图属性</strong>：分支就是引用，而引用就是文件，文件中存储着commit的哈希值。这意味着Git的分支是轻量级的。</p>
 <p>创建deputy分支使用<code>commit a3</code>安全地保存在这个分支里。HEAD依然处理分离头指针状态。它还是直接指向<code>commit a3</code>.</p>
-<p><img src="images/git-from-the-inside-out/11-a3-on-deputy.png" alt="创建分支deputy"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/11-a3-on-deputy.png" alt="创建分支deputy"></p>
 <h2 id="切换分支"><a href="#切换分支" class="headerlink" title="切换分支"></a>切换分支</h2><hr>
 <figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git checkout <span class="literal">master</span></span><br><span class="line">Previous HEAD position was <span class="number">50</span>ac643 a3</span><br><span class="line">Switched to branch '<span class="literal">master</span>'</span><br></pre></td></tr></table></figure>
 <p>用户切换到<code>master</code>分支,这个命令执行以下操作：</p>
@@ -324,7 +323,7 @@
 <li>Git将<code>HEAD</code>指向<code>master</code>分支，即<code>HEAD</code>文件的内容从哈希值变为：<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alpha $ cat .git/HEAD</span><br><span class="line"><span class="built_in">ref</span>: <span class="built_in">ref</span>s/heads/master</span><br></pre></td></tr></table></figure>
 对应的树形图为：</li>
 </ul>
-<p><img src="images/git-from-the-inside-out/12-a3-on-master-on-a2.png" alt="切换到master分支"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/12-a3-on-master-on-a2.png" alt="切换到master分支"></p>
 <h1 id="切换到一个与当前工作空间不兼容的分支"><a href="#切换到一个与当前工作空间不兼容的分支" class="headerlink" title="切换到一个与当前工作空间不兼容的分支"></a>切换到一个与当前工作空间不兼容的分支</h1><hr>
 <figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">alpha $ printf <span class="string">'789'</span> &gt; data/<span class="built_in">number</span>.txt</span><br><span class="line">alpha $ git checkout deputy</span><br><span class="line">error: Your <span class="built_in">local</span> changes <span class="built_in">to</span> <span class="keyword">the</span> following <span class="built_in">files</span> would be overwritten <span class="keyword">by</span> checkout:</span><br><span class="line">        data/<span class="built_in">number</span>.txt</span><br><span class="line">Please commit your changes <span class="keyword">or</span> stash them <span class="keyword">before</span> you <span class="keyword">switch</span> branches.</span><br><span class="line">Aborting</span><br></pre></td></tr></table></figure>
 <p>假设用户意外将<code>data/number.txt</code>的内容修改为<code>789</code>(还没有保存),然后他尝试切换到分支<code>deputy</code>。但Git阻止了这个动作。</p>
@@ -333,7 +332,7 @@
 <p>Git可以将当前工作空间的内容与将要切换的分支进行合并，但是这个过程是复杂的。所以，Git阻止了这个行为。</p>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">alpha <span class="variable">$</span> printf <span class="string">'2'</span> &gt; <span class="keyword">data</span>/number.txt</span><br><span class="line">alpha <span class="variable">$</span> git checkout deputy</span><br><span class="line">Switched to branch <span class="string">'deputy'</span></span><br></pre></td></tr></table></figure>
 <p>当用户将之前意外修改的<code>data/number.txt</code> 重新设置为原来的内容，他就可以成功切换分支：</p>
-<p><img src="images/git-from-the-inside-out/13-a3ondeputy.png" alt="checkout deputy的问题"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/13-a3ondeputy.png" alt="checkout deputy的问题"></p>
 <h2 id="合并一个祖先分支"><a href="#合并一个祖先分支" class="headerlink" title="合并一个祖先分支"></a>合并一个祖先分支</h2><hr>
 <figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git merge <span class="literal">master</span></span><br><span class="line">Already up to <span class="keyword">date</span>.</span><br></pre></td></tr></table></figure>
 
@@ -342,11 +341,11 @@
 <h2 id="合并一个后代分支"><a href="#合并一个后代分支" class="headerlink" title="合并一个后代分支"></a>合并一个后代分支</h2><hr>
 <figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git checkout <span class="literal">master</span></span><br><span class="line">Switched to branch '<span class="literal">master</span>'</span><br></pre></td></tr></table></figure>
 <p>用户先切换到<code>master</code>分支</p>
-<p><img src="images/git-from-the-inside-out/14-a3-on-master-on-a2.png" alt="从commit a3 切换到 commit a2"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/14-a3-on-master-on-a2.png" alt="从commit a3 切换到 commit a2"></p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git <span class="keyword">merge</span> deputy</span><br><span class="line"><span class="keyword">Fast</span>-forward</span><br></pre></td></tr></table></figure>
 <p>用户将<code>deputy</code>分支合并到<code>master</code>分支。Git发现<code>master</code>这个接收者分支是<code>deputy</code>的祖先分支，它可以做<code>fast-forward</code> 合并。</p>
 <p>Git获取到deputy指向的<code>commit a3</code>及它指向的树形图，Git将树形中的内容写到工作空间中，并更新index。这样Git就完成了fast-forward。</p>
-<p><img src="images/git-from-the-inside-out/15-a3-on-master.png" alt="master fast-forward"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/15-a3-on-master.png" alt="master fast-forward"></p>
 <p><strong>树形图属性</strong>：树形图中的一系列提交可以理解为对内容的一系列修改。这意味着，在合并的两个分支中，如果提供者分支是接收者分支的后代，版本历史是没有改变的。例如<code>deputy</code>指向的<code>commit a3</code>的历史有<code>a2</code> 和<code>a1</code>. 而<code>master</code>指向的<code>commit a2</code>的历史有<code>a1</code>,这些历史提交版本并没有不同之处。因此，Git直接将<code>HEAD</code>指向到时提供者<code>deputy</code>分支上即可。</p>
 <p>以上是两种简单的合并情况，下面是复杂的合并情况</p>
 <h2 id="合并两个兄弟分支"><a href="#合并两个兄弟分支" class="headerlink" title="合并两个兄弟分支"></a>合并两个兄弟分支</h2><hr>
@@ -354,7 +353,7 @@
 <p>用户修改<code>master</code>分支下的<code>data/number.txt</code>，并提交修改</p>
 <figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git checkout deputy</span><br><span class="line">Switched to branch 'deputy'</span><br><span class="line">alpha $ <span class="built_in">printf</span> 'b' &gt; data/letter.txt</span><br><span class="line">alpha $ git add data/letter.txt</span><br><span class="line">alpha $ git commit -m 'b3';</span><br><span class="line">[deputy <span class="number">070b587</span>] b3</span><br><span class="line"> <span class="number">1</span> file changed, <span class="number">1</span> insertion(+), <span class="number">1</span> deletion(-)</span><br></pre></td></tr></table></figure>
 <p>用户切换到<code>deputy</code>分支，并修改<code>data/letter.txt</code> ，并提交修改。两个分支的操作结果用树形图表示为：</p>
-<p><img src="images/git-from-the-inside-out/16-a4-b3-on-deputy.png" alt="commit a4 和commit b3"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/16-a4-b3-on-deputy.png" alt="commit a4 和commit b3"></p>
 <p><strong>树形图属性</strong>：不同的commit可以共有一个父commit。这意味着在提交历史中可以有两个或多个不同的后代分支。</p>
 <p><strong>树形图属性</strong>：commit可以拥有多个父commit。这意味着两个分离的分支可以合并成一个分支。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git <span class="keyword">merge</span> <span class="keyword">master</span> -m <span class="string">'b4'</span></span><br><span class="line"><span class="keyword">Merge</span> made <span class="keyword">by</span> the <span class="string">'recursive'</span> strategy.</span><br><span class="line"> <span class="keyword">data</span>/number.txt | <span class="number">2</span> +-</span><br><span class="line"> <span class="number">1</span> <span class="keyword">file</span> <span class="keyword">changed</span>, <span class="number">1</span> insertion(+), <span class="number">1</span> deletion(-)</span><br></pre></td></tr></table></figure>
@@ -362,7 +361,7 @@
 <p>Git发现<code>接收者</code>分支<code>commit b3</code> 和<code>提供者</code>分支<code>commit a4</code>是属于旁系分支(之前的是直系分支），合并这种分支需要八个步骤：</p>
 <p>第一，Git将的<code>提供者</code>分支的哈希值写到文件<code>.git/MERGE_HEAD</code>中，这个文件的存在告诉Git正处理合并中。</p>
 <p>第二，Git先找到两个分支的最后共同祖先，在这里是<code>commit a3</code></p>
-<p><img src="images/git-from-the-inside-out/17-a4-b3-on-deputy.png" alt="共同祖先分支commit a3"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/17-a4-b3-on-deputy.png" alt="共同祖先分支commit a3"></p>
 <p><strong>树形图属性</strong>：commit拥有父commit。这意味着两个不同世系的commit可以找到一个共同的祖先commit。Git通过commit对象中保存的父commit对象查找，最终，找到<code>commit a3</code>为<code>commit b3</code>和<code>commit a4</code>的共同祖先.</p>
 <p>第三，Git从<code>commit a3</code>、<code>commit b3</code> 、<code>commit a4</code>指向的树形图中生成各自的<code>index</code>,这个<code>index</code>就如同之前的一样，包含了git保存的所有文件的信息。</p>
 <p>第四，Git通过以<code>commit a3</code>为的<code>index</code>基础，将<code>commit a4</code>和<code>commit b3</code>的<code>index</code>与之对比，通过对比决定对文件做哪些操作，这些操作将写入到一个<code>diff</code>缓冲区，这个<code>diff</code>里面的条目包含文件路径，并且标记这些文件的变化类型：<em>增加、删除、修改、冲突</em>。</p>
@@ -379,17 +378,17 @@
 <p>可以看出<code>commit b4</code>有两个父commit。</p>
 <p>第八，Git将<code>HEAD</code>指向当前分支<code>deputy</code>的最新提交。</p>
 <p>所有步骤的最后结果用树形图表示为</p>
-<p><img src="images/git-from-the-inside-out/18-b4-on-deputy.png" alt="合并两个旁系分支"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/18-b4-on-deputy.png" alt="合并两个旁系分支"></p>
 <h2 id="合并两个来自旁系分支且它们修改同一文件"><a href="#合并两个来自旁系分支且它们修改同一文件" class="headerlink" title="合并两个来自旁系分支且它们修改同一文件"></a>合并两个来自旁系分支且它们修改同一文件</h2><hr>
 <figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git checkout master</span><br><span class="line">alpha $ git merge deputy</span><br><span class="line">Updating <span class="number">19</span>a5293..d206abe</span><br><span class="line">Fast-forward</span><br><span class="line"> data/letter.txt | <span class="number">2</span> +-</span><br><span class="line"> <span class="number">1</span> file <span class="section">changed</span>, <span class="number">1</span> insertion(+), <span class="number">1</span> deletion(-)</span><br></pre></td></tr></table></figure>
 <p>用户切换到时<code>master</code>分支，并将<code>deputy</code>分支合并到<code>master</code>分支。这个动作的结果是master fast-forward到<code>commit b4</code>。现在<code>master</code>与<code>deputy</code>都指向同一个commit。</p>
-<p><img src="images/git-from-the-inside-out/19-b4-master-deputy-on-b4.png" alt="master fast forward"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/19-b4-master-deputy-on-b4.png" alt="master fast forward"></p>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">alpha <span class="variable">$</span> git checkout deputy</span><br><span class="line">Switched to branch <span class="string">'deputy'</span></span><br><span class="line">alpha <span class="variable">$</span> printf <span class="string">'5'</span> &gt; <span class="keyword">data</span>/number.txt</span><br><span class="line">alpha <span class="variable">$</span> git add <span class="keyword">data</span>/number.txt</span><br><span class="line">alpha <span class="variable">$</span> git commit <span class="literal">-m</span> <span class="string">'b5'</span></span><br><span class="line">[<span class="type">deputy</span> <span class="number">5840214</span>] b5</span><br><span class="line"> <span class="number">1</span> file changed, <span class="number">1</span> insertion(+), <span class="number">1</span> deletion(-)</span><br></pre></td></tr></table></figure>
 <p>用户切换到<code>deputy</code>，将<code>data/number.txt</code>的内容改变为<code>5</code>，并提交修改。</p>
 <figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git checkout <span class="literal">master</span></span><br><span class="line">Switched to branch '<span class="literal">master</span>'</span><br><span class="line">alpha $ printf '<span class="number">6</span>' &gt; data/<span class="keyword">number</span>.txt</span><br><span class="line">alpha $ git add data/<span class="keyword">number</span>.txt</span><br><span class="line">alpha $ git commit -m 'b6'</span><br><span class="line">[<span class="keyword">master</span> <span class="title">0163655</span>] b6</span><br><span class="line"> <span class="number">1</span> file changed, <span class="number">1</span> insertion(+), <span class="number">1</span> deletion(-)</span><br></pre></td></tr></table></figure>
 
 <p>用户切换到<code>master</code>，将<code>data/number.txt</code>的内容改变为<code>6</code>，并提交修改。</p>
-<p><img src="images/git-from-the-inside-out/20-b5-on-deputy-b6-on-master.png" alt="两个旁系分支修改同一文件"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/20-b5-on-deputy-b6-on-master.png" alt="两个旁系分支修改同一文件"></p>
 <figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git merge deputy</span><br><span class="line">Auto-merging data/number.txt</span><br><span class="line"><span class="keyword">CONFLICT</span> (content): Merge <span class="keyword">conflict</span> <span class="keyword">in</span> data/number.txt</span><br><span class="line">Automatic merge failed; fix conflicts <span class="keyword">and</span> <span class="keyword">then</span> <span class="keyword">commit</span> the result.</span><br></pre></td></tr></table></figure>
 
 <p>用户想将<code>deputy</code>合并到git，但是出现冲突导致合并中止。合并冲突处理的前六个步骤与不冲突的合并处理一样：</p>
@@ -403,7 +402,7 @@
 </ul>
 <p>由于冲突，第七和第八步不会发生。下面再次分析这些过程看看发生了什么。</p>
 <p>第一，Git将提供方commit的哈希值写到文件<code>.git/MERGE_HEAD</code>.</p>
-<p><img src="images/git-from-the-inside-out/21-b6-on-master-with-merge-head.png" alt="MERGE_HEAD"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/21-b6-on-master-with-merge-head.png" alt="MERGE_HEAD"></p>
 <p>第二，Git找到双方的最近的父commit，这里是<code>commit b4</code>.</p>
 <p>第三，Git通过父commit、提供方commit、接收方commit分别生成它们的<code>index</code>。</p>
 <p>第四，Git生成一个diff，里面组合了三个commit的更改信息。这个diff里面是一些文件路径，并且标明这些文件发生的修改是：添加、删除、修改还是冲突。</p>
@@ -425,22 +424,22 @@
 <p>第八，Git将<code>HEAD</code>指向当前分支<code>master</code>最新的<code>commit b11</code>.</p>
 <h2 id="删除文件"><a href="#删除文件" class="headerlink" title="删除文件"></a>删除文件</h2><hr>
 <p>下图是树形图包含所有历史commit、最新的commit包含的tree&amp;blob对象和工作空间及<code>index</code>：</p>
-<p><img src="images/git-from-the-inside-out/23-b11-with-objects-wc-and-index.png" alt="当前状态下完整的树形图"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/23-b11-with-objects-wc-and-index.png" alt="当前状态下完整的树形图"></p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">alpha</span> $ git rm <span class="class"><span class="keyword">data</span>/letter.txt</span></span><br><span class="line"><span class="title">rm</span> '<span class="class"><span class="keyword">data</span>/letter.txt'</span></span><br></pre></td></tr></table></figure>
 
 <p>用户告知Git删除了<code>data/letter.txt</code>文件。此时工作空间中的文件被删除，<code>index</code>中关于<code>data/letter.txt</code>的条目也被删除，说明Git不再追踪此文件。</p>
-<p><img src="images/git-from-the-inside-out/24-b11-letter-removed-from-wc-and-index.png" alt="删除文件"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/24-b11-letter-removed-from-wc-and-index.png" alt="删除文件"></p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git <span class="keyword">commit</span> -m <span class="string">'11'</span></span><br><span class="line">[<span class="keyword">master</span> <span class="number">1</span>f727e1] <span class="number">11</span></span><br><span class="line"> <span class="number">1</span> <span class="keyword">file</span> <span class="keyword">changed</span>, <span class="number">1</span> deletion(-)</span><br><span class="line"> <span class="keyword">delete</span> <span class="keyword">mode</span> <span class="number">100644</span> <span class="keyword">data</span>/letter.txt</span><br></pre></td></tr></table></figure>
 
 <p>用户提交了删除文件的修改。用于根据<code>index</code>中的内容生成一个新的树形图表示<code>index</code>中的内容。<code>data/letter.txt</code>不再包含在这个新的树形图中，因为它不在<code>index</code>中。</p>
-<p><img src="images/git-from-the-inside-out/25-11.png" alt="删除提交后的树形图"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/25-11.png" alt="删除提交后的树形图"></p>
 <h2 id="复制一个仓库"><a href="#复制一个仓库" class="headerlink" title="复制一个仓库"></a>复制一个仓库</h2><hr>
 <figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">alpha</span></span> <span class="symbol">$</span> cd ..</span><br><span class="line">git <span class="symbol">$</span> cp -R alpha bravo</span><br><span class="line">git <span class="symbol">$</span> ls</span><br><span class="line">alpha  bravo</span><br></pre></td></tr></table></figure>
 
 <p>用户将文件夹<code>alpha</code>中的所有内容复制到<code>bravo</code>文件夹中。现在git的目录结构如下：</p>
 <figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">git $ tree</span><br><span class="line">.</span><br><span class="line">|<span class="comment">-- alpha</span></span><br><span class="line">|   `<span class="comment">-- data</span></span><br><span class="line">|       `<span class="comment">-- number.txt</span></span><br><span class="line">`<span class="comment">-- bravo</span></span><br><span class="line">    `<span class="comment">-- data</span></span><br><span class="line">        `<span class="comment">-- number.txt</span></span><br></pre></td></tr></table></figure>
 <p>现在，<code>bravo</code>目录下同样包含一个树形图：</p>
-<p><img src="images/git-from-the-inside-out/26-11-cp-alpha-to-bravo.png" alt="复制git仓库"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/26-11-cp-alpha-to-bravo.png" alt="复制git仓库"></p>
 <h2 id="连接两个Git仓库中"><a href="#连接两个Git仓库中" class="headerlink" title="连接两个Git仓库中"></a>连接两个Git仓库中</h2><hr>
 <figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git <span class="symbol">$</span> cd alpha/</span><br><span class="line"><span class="function"><span class="title">alpha</span></span> <span class="symbol">$</span> git remote add bravo ../bravo</span><br></pre></td></tr></table></figure>
 <p>用户重新的进入<code>alpha</code>仓库，他将<code>bravo</code>设为一个远程仓库。这个操作会被记录在<code>.git/config</code>中。</p>
@@ -450,7 +449,7 @@
 <figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">alpha</span></span> <span class="symbol">$</span> cd ../bravo</span><br><span class="line">bravo <span class="symbol">$</span> printf <span class="string">'12'</span> &gt; data/number.txt</span><br><span class="line">bravo <span class="symbol">$</span> git add data/number.txt</span><br><span class="line">bravo <span class="symbol">$</span> git commit -m <span class="string">'12'</span></span><br><span class="line">[master f8f1d2c] <span class="number">12</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">file</span> changed, <span class="number">1</span> insertion(+), <span class="number">1</span> deletion(-)</span><br></pre></td></tr></table></figure>
 
 <p>用户在<code>bravo</code>仓库中将<code>data/number.txt</code>的内容修改为<code>12</code>并提交本次修改。结果如下：</p>
-<p><img src="images/git-from-the-inside-out/27-12-bravo.png" alt="bravo仓库修改后"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/27-12-bravo.png" alt="bravo仓库修改后"></p>
 <figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">bravo $ cd ../alpha/</span><br><span class="line">alpha $ git fetch bravo master</span><br><span class="line">remote: Enumerating objects: <span class="number">7</span>, done.</span><br><span class="line">remote: Counting objects: <span class="number">100</span>% (<span class="number">7</span>/<span class="number">7</span>), done.</span><br><span class="line">remote: Total <span class="number">4</span> (delta <span class="number">0</span>), reused <span class="number">0</span> (delta <span class="number">0</span>)</span><br><span class="line">Unpacking objects: <span class="number">100</span>% (<span class="number">4</span>/<span class="number">4</span>), done.</span><br><span class="line">From ../bravo</span><br><span class="line"> * branch            master     -&gt; FETCH_HEAD</span><br><span class="line"> * [new branch]      master     -&gt; bravo/master</span><br></pre></td></tr></table></figure>
 
 <p>用户重新的回到<code>alpha</code>仓库，并从<code>bravo</code>中获取<code>master</code>分支到<code>alpha</code>中。这个过程分为四步：</p>
@@ -460,13 +459,13 @@
 <p>第四，<code>alpha/.git/FETCH_HEAD</code>的内容设置为</p>
 <figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">f8f1d2c62a3666b80910e2182867a45d9040b48e</span></span>                branch <span class="string">'master'</span> of ../bravo</span><br></pre></td></tr></table></figure>
 <p>这表明最新的的<code>fetch</code>命令从<code>bravo</code>中获取了<code>master</code>分支的<code>f8f1</code>指向的commit对象。</p>
-<p><img src="images/git-from-the-inside-out/28-12-fetched-to-alpha.png" alt="从远程仓库获取分支"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/28-12-fetched-to-alpha.png" alt="从远程仓库获取分支"></p>
 <p><strong>树形图属性</strong>：对象是可以复制的。这意味着整个仓库的历史可以在不同的仓库中共享。</p>
 <p><strong>树形图属性</strong>：一个仓库可以存储远程仓库的分支引用如<code>alpha/.git/refs/remotes/bravo/master</code>.这意味仓库中可以将本地状态存储在远程仓库中。如果远程仓库更新的了，那么本地获取的分支将会过时。</p>
 <h2 id="合并FETCH-HEAD"><a href="#合并FETCH-HEAD" class="headerlink" title="合并FETCH_HEAD"></a>合并FETCH_HEAD</h2><hr>
 <figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git merge FETCH_HEAD</span><br><span class="line">Updating <span class="number">1</span>f727e1..f8f1d2c</span><br><span class="line">Fast-forward</span><br><span class="line"> data/number.txt | <span class="number">2</span> +-</span><br><span class="line"> <span class="number">1</span> file <span class="section">changed</span>, <span class="number">1</span> insertion(+), <span class="number">1</span> deletion(-)</span><br></pre></td></tr></table></figure>
 <p>用户将<code>FETCH_HEAD</code>指向的分支合并到<code>master</code>分支中。注意<code>FETCH_HEAD</code>也只不过是一个引用而已。这个过程与先前的合并本地分支没有什么不同，在这里，Git做了一个fast-forward合并，将<code>master</code>指向了<code>commit 12</code>. 合并后的树形图表示如下：</p>
-<p><img src="images/git-from-the-inside-out/29-12-merged-to-alpha.png" alt="master fast forward to commit 12"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/29-12-merged-to-alpha.png" alt="master fast forward to commit 12"></p>
 <h2 id="从-远程仓库中拉取一个分支"><a href="#从-远程仓库中拉取一个分支" class="headerlink" title="从 远程仓库中拉取一个分支"></a>从 远程仓库中拉取一个分支</h2><hr>
 <figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git pull bravo <span class="literal">master</span></span><br><span class="line">From ../bravo</span><br><span class="line"> * branch            <span class="keyword">master</span>     <span class="title">-&gt; FETCH_HEAD</span></span><br><span class="line">Already up to <span class="keyword">date</span>.</span><br></pre></td></tr></table></figure>
 <p>用户将<code>bravo</code>中的<code>master</code>分支拉取到本地仓库中。<code>pull</code>其实就是 <code>fetch</code>和<code>merge FETCH_HEAD</code>的合并操作。Git完成这两个命令后，并报告master is Already up to date.</p>
@@ -494,12 +493,12 @@
 <p>所有原本存储在<code>.git</code>中的文件现在都存储在根目录中。并且没有了原本工作空间中的文件。</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># bare repo</span></span><br><span class="line">delta $ ls</span><br><span class="line">branches <span class="built_in"> config </span> description  HEAD  hooks  <span class="builtin-name">info</span>  objects  packed-refs  refs</span><br><span class="line"></span><br><span class="line"><span class="comment"># ordinary repo</span></span><br><span class="line">delta $ ls <span class="built_in">..</span>/alpha/  <span class="built_in">..</span>/alpha/.git -ah</span><br><span class="line"><span class="built_in">..</span>/alpha/:</span><br><span class="line">.  <span class="built_in">..</span>  data  .git</span><br><span class="line"></span><br><span class="line">**<span class="built_in">..</span>/alpha/.git:**</span><br><span class="line">.   branches       <span class="built_in"> config </span>      FETCH_HEAD  hooks  <span class="builtin-name">info</span>  objects    refs</span><br><span class="line"><span class="built_in">..</span>  COMMIT_EDITMSG  description  HEAD        index  logs  ORIG_HEAD</span><br></pre></td></tr></table></figure>
 
-<p><img src="images/git-from-the-inside-out/30-13-alpha-cloned-to-delta-bare.png" alt="裸仓库"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/30-13-alpha-cloned-to-delta-bare.png" alt="裸仓库"></p>
 <h2 id="推送一个分支到bare仓库中"><a href="#推送一个分支到bare仓库中" class="headerlink" title="推送一个分支到bare仓库中"></a>推送一个分支到bare仓库中</h2><hr>
 <figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">delta</span></span> <span class="symbol">$</span> cd ../alpha/</span><br><span class="line"><span class="function"><span class="title">alpha</span></span> <span class="symbol">$</span> git remote add delta ../delta</span><br><span class="line">alpha <span class="symbol">$</span> printf <span class="string">'14'</span> &gt; data/number.txt</span><br><span class="line">alpha <span class="symbol">$</span> git commit -am<span class="string">'14'</span></span><br><span class="line">[master f001318] <span class="number">14</span></span><br><span class="line"> <span class="number">1</span> <span class="keyword">file</span> changed, <span class="number">1</span> insertion(+), <span class="number">1</span> deletion(-)</span><br></pre></td></tr></table></figure>
 
 <p>用户进入<code>alpha</code>仓库，将<code>delta</code>设置远程仓库，修改<code>data/number.txt</code>中的内容为<code>14</code>，并提交这次操作。</p>
-<p><img src="images/git-from-the-inside-out/31-14-alpha.png" alt="更新alpha"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/31-14-alpha.png" alt="更新alpha"></p>
 <figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">alpha $ git push delta master</span><br><span class="line">Enumerating objects: <span class="number">7</span>, done.</span><br><span class="line">Counting objects: <span class="number">100</span>% (<span class="number">7</span>/<span class="number">7</span>), done.</span><br><span class="line">Writing objects: <span class="number">100</span>% (<span class="number">4</span>/<span class="number">4</span>), <span class="number">276</span> bytes | <span class="number">276.00</span> KiB/s, done.</span><br><span class="line">Total <span class="number">4</span> (delta <span class="number">0</span>), reused <span class="number">0</span> (delta <span class="number">0</span>)</span><br><span class="line">To ../delta</span><br><span class="line">   b92ab33..f001318  master -&gt; master</span><br></pre></td></tr></table></figure>
 
 <p>用户将<code>alpha</code>的<code>master</code>分支推送到<code>delta</code>。这个<code>push</code>操作分为三步：</p>
@@ -507,7 +506,7 @@
 <p>第二，<code>delta/refs/heads/master</code>更新的<code>commit 14</code></p>
 <figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">delta $ cat HEAD</span><br><span class="line"><span class="keyword">ref</span>: refs/heads/<span class="literal">master</span></span><br><span class="line">delta $ cat refs/heads/<span class="literal">master</span></span><br><span class="line">f0013185d0a45ecf7f7be00692ddfa6359954513</span><br><span class="line"></span><br><span class="line">delta $ cd ../alpha</span><br><span class="line">alpha $ cat .git/HEAD</span><br><span class="line"><span class="keyword">ref</span>: refs/heads/<span class="literal">master</span></span><br><span class="line">alpha $ cat .git/refs/heads/<span class="literal">master</span></span><br><span class="line">f0013185d0a45ecf7f7be00692ddfa6359954513</span><br></pre></td></tr></table></figure>
 <p>第三，<code>alpha/.git/refs/remotes/delta/master</code>更新为指向<code>commit 14</code>这时，<code>alpha</code>将自己的最新状态同步到<code>delta</code>中。</p>
-<p><img src="images/git-from-the-inside-out/32-14-pushed-to-delta.png" alt="推送到裸仓库"></p>
+<p><img src="/2020/04/01/git-from-the-inside-out/32-14-pushed-to-delta.png" alt="推送到裸仓库"></p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
 <p>Git建立在这个抽象的树形图中。几乎所有的Git命令都会操作这个树形图。要想深入理解Git，重点关注这个树形图的属性，而不是死记命令。<br>因此，为了深入学习Git，探索.git目录中的内容是不可避免。</p>
 <p>文中还没有涉及到的命令：</p>
@@ -522,13 +521,13 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://github.com/yvkm/2020/04/02/Git_from_the_inside_out/" data-id="ck8lfs59f00003gaph4wu3pw6" class="article-share-link" data-share="baidu" data-title="深入浅出Git原理">分享到</a>
+        <a data-url="http://yvkm.github.io/2020/04/01/git-from-the-inside-out/" data-id="ck8mda4cl0001agap4vjzedzr" class="article-share-link" data-share="baidu" data-title="深入浅出Git原理">分享到</a>
       
 
       
 
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/" rel="tag">git</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/" rel="tag">Git</a></li></ul>
 
     </footer>
   </div>
@@ -536,15 +535,11 @@
     
 <nav id="article-nav">
   
-    <a href="/2020/04/02/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">下一篇</strong>
-      <div class="article-nav-title">
-        
-          Redis分布式锁
-        
-      </div>
-    </a>
   
+    <a href="/2020/02/03/redis-lock/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">Redis分布式锁</div>
+    </a>
   
 </nav>
 
@@ -568,7 +563,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BeanFactory/" rel="tag">BeanFactory</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Framework/" rel="tag">Spring Framework</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/" rel="tag">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/BeanFactory/" rel="tag">BeanFactory</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/" rel="tag">Git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Framework/" rel="tag">Spring Framework</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
